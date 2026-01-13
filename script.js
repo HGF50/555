@@ -12,6 +12,19 @@ let isLoading = false;
 
 // Initialisation au chargement de la page
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM chargé, initialisation...');
+    
+    // Vérifier si le formulaire existe
+    const sellForm = document.getElementById('sellForm');
+    if (sellForm) {
+        console.log('Formulaire trouvé, ajout des écouteurs');
+        
+        // Ajouter l'écouteur d'événement de soumission
+        sellForm.addEventListener('submit', handleFormSubmit);
+    } else {
+        console.error('Formulaire non trouvé!');
+    }
+    
     loadProducts();
     setupEventListeners();
     updateCartCount();
@@ -23,6 +36,126 @@ document.addEventListener('DOMContentLoaded', function() {
         updateTotalPrice(); // Calcul initial
     }
 });
+
+// Fonction de soumission du formulaire séparée
+async function handleFormSubmit(e) {
+    e.preventDefault();
+    
+    console.log('=== SOUMISSION DU FORMULAIRE ===');
+    console.log('Début de la soumission du formulaire');
+    
+    if (!validateForm()) {
+        console.log('Validation échouée');
+        return;
+    }
+    
+    const form = e.target;
+    const formData = new FormData(form);
+    
+    console.log('FormData:', Object.fromEntries(formData));
+    
+    // Ajouter les informations du vendeur (simulation)
+    const sellerInfo = {
+        name: "Utilisateur Demo",
+        rating: 4.5,
+        avatar: "https://picsum.photos/seed/seller/50/50"
+    };
+    
+    // Préparer les données pour l'API
+    const price = parseFloat(formData.get('price'));
+    const protectionFees = Math.round(price * 0.05);
+    const totalPrice = price + protectionFees;
+    
+    const productData = {
+        title: formData.get('title'),
+        brand: formData.get('brand'),
+        price: price,
+        originalPrice: formData.get('originalPrice') ? parseFloat(formData.get('originalPrice')) : null,
+        size: formData.get('size'),
+        condition: formData.get('condition'),
+        category: formData.get('category'),
+        description: formData.get('description'),
+        seller: sellerInfo,
+        images: uploadedPhotos.map(photo => photo.url),
+        image: uploadedPhotos.length > 0 ? uploadedPhotos[0].url : 'https://picsum.photos/seed/default/300/400',
+        protectionFees: protectionFees,
+        totalPrice: totalPrice
+    };
+    
+    console.log('Données à envoyer:', productData);
+    console.log('URL de l\'API:', API_BASE_URL);
+    
+    // Afficher l'état de chargement
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Publication en cours...';
+    submitBtn.disabled = true;
+    form.classList.add('form-loading');
+    
+    try {
+        const url = `${API_BASE_URL}/products`;
+        console.log('Envoi de la requête à:', url);
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(productData)
+        });
+        
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        console.log('Response URL:', response.url);
+        
+        // Vérifier si la réponse est du JSON
+        const contentType = response.headers.get('content-type');
+        console.log('Content-Type:', contentType);
+        
+        if (!response.ok) {
+            // Si le statut n'est pas OK, essayer de lire l'erreur
+            let errorMessage = `Erreur HTTP ${response.status}`;
+            try {
+                const errorText = await response.text();
+                console.log('Response error text:', errorText);
+                if (errorText.startsWith('{')) {
+                    const errorJson = JSON.parse(errorText);
+                    errorMessage = errorJson.error || errorMessage;
+                }
+            } catch (e) {
+                console.log('Impossible de parser l\'erreur:', e);
+            }
+            throw new Error(errorMessage);
+        }
+        
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.log('Response text (non-JSON):', text);
+            throw new Error('Le serveur a renvoyé une réponse non-JSON. Réponse: ' + text.substring(0, 200));
+        }
+        
+        const result = await response.json();
+        console.log('Response JSON:', result);
+        
+        showMessage('Article publié avec succès !', 'success');
+        closeSellModal();
+        
+        // Recharger les produits pour afficher le nouvel article
+        setTimeout(() => {
+            loadProducts();
+        }, 1000);
+        
+    } catch (error) {
+        console.error('Erreur complète:', error);
+        showMessage('Erreur lors de la publication: ' + error.message, 'error');
+    } finally {
+        // Restaurer le bouton
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        form.classList.remove('form-loading');
+    }
+}
 
 // Configuration des écouteurs d'événements
 function setupEventListeners() {
@@ -518,107 +651,6 @@ function showFieldError(field, message) {
     formGroup.appendChild(errorDiv);
 }
 
-// Soumission du formulaire
-document.getElementById('sellForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    console.log('Début de la soumission du formulaire');
-    
-    if (!validateForm()) {
-        console.log('Validation échouée');
-        return;
-    }
-    
-    const form = e.target;
-    const formData = new FormData(form);
-    
-    console.log('FormData:', Object.fromEntries(formData));
-    
-    // Ajouter les informations du vendeur (simulation)
-    const sellerInfo = {
-        name: "Utilisateur Demo",
-        rating: 4.5,
-        avatar: "https://picsum.photos/seed/seller/50/50"
-    };
-    
-    // Préparer les données pour l'API
-    const price = parseFloat(formData.get('price'));
-    const protectionFees = Math.round(price * 0.05);
-    const totalPrice = price + protectionFees;
-    
-    const productData = {
-        title: formData.get('title'),
-        brand: formData.get('brand'),
-        price: price,
-        originalPrice: formData.get('originalPrice') ? parseFloat(formData.get('originalPrice')) : null,
-        size: formData.get('size'),
-        condition: formData.get('condition'),
-        category: formData.get('category'),
-        description: formData.get('description'),
-        seller: sellerInfo,
-        images: uploadedPhotos.map(photo => photo.url),
-        image: uploadedPhotos.length > 0 ? uploadedPhotos[0].url : 'https://picsum.photos/seed/default/300/400',
-        protectionFees: protectionFees,
-        totalPrice: totalPrice
-    };
-    
-    console.log('Données à envoyer:', productData);
-    
-    // Afficher l'état de chargement
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Publication en cours...';
-    submitBtn.disabled = true;
-    form.classList.add('form-loading');
-    
-    try {
-        console.log('Envoi de la requête à:', `${API_BASE_URL}/products`);
-        
-        const response = await fetch(`${API_BASE_URL}/products`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(productData)
-        });
-        
-        console.log('Response status:', response.status);
-        console.log('Response headers:', response.headers);
-        
-        // Vérifier si la réponse est du JSON
-        const contentType = response.headers.get('content-type');
-        console.log('Content-Type:', contentType);
-        
-        if (!contentType || !contentType.includes('application/json')) {
-            const text = await response.text();
-            console.log('Response text (non-JSON):', text);
-            throw new Error('Le serveur a renvoyé une réponse non-JSON. Vérifiez la console du serveur.');
-        }
-        
-        const result = await response.json();
-        console.log('Response JSON:', result);
-        
-        if (response.ok) {
-            showMessage('Article publié avec succès !', 'success');
-            closeSellModal();
-            
-            // Recharger les produits pour afficher le nouvel article
-            setTimeout(() => {
-                loadProducts();
-            }, 1000);
-        } else {
-            throw new Error(result.error || 'Erreur lors de la publication');
-        }
-    } catch (error) {
-        console.error('Erreur complète:', error);
-        showMessage('Erreur lors de la publication: ' + error.message, 'error');
-    } finally {
-        // Restaurer le bouton
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-        form.classList.remove('form-loading');
-    }
-});
 
 // Fermer le modal en cliquant sur l'overlay
 document.getElementById('sellModal').addEventListener('click', function(e) {

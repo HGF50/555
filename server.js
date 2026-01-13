@@ -205,6 +205,10 @@ app.get('/api/products/:id', async (req, res) => {
 
 // POST créer un produit
 app.post('/api/products', async (req, res) => {
+    console.log('Requête POST reçue sur /api/products');
+    console.log('Headers:', req.headers);
+    console.log('Body brut:', req.body);
+    
     try {
         const productData = {
             _id: nextId.toString(),
@@ -216,10 +220,14 @@ app.post('/api/products', async (req, res) => {
             views: 0
         };
         
+        console.log('Produit à créer:', productData);
+        
         products.push(productData);
         nextId++;
         
-        console.log('Produit créé:', productData);
+        console.log('Produit créé avec succès:', productData);
+        
+        // S'assurer que la réponse est JSON
         res.status(201).json(productData);
     } catch (error) {
         console.error('Erreur POST /api/products:', error);

@@ -522,12 +522,17 @@ function showFieldError(field, message) {
 document.getElementById('sellForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
+    console.log('Début de la soumission du formulaire');
+    
     if (!validateForm()) {
+        console.log('Validation échouée');
         return;
     }
     
     const form = e.target;
     const formData = new FormData(form);
+    
+    console.log('FormData:', Object.fromEntries(formData));
     
     // Ajouter les informations du vendeur (simulation)
     const sellerInfo = {
@@ -557,6 +562,8 @@ document.getElementById('sellForm').addEventListener('submit', async function(e)
         totalPrice: totalPrice
     };
     
+    console.log('Données à envoyer:', productData);
+    
     // Afficher l'état de chargement
     const submitBtn = form.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
@@ -565,6 +572,8 @@ document.getElementById('sellForm').addEventListener('submit', async function(e)
     form.classList.add('form-loading');
     
     try {
+        console.log('Envoi de la requête à:', `${API_BASE_URL}/products`);
+        
         const response = await fetch(`${API_BASE_URL}/products`, {
             method: 'POST',
             headers: {
@@ -573,7 +582,21 @@ document.getElementById('sellForm').addEventListener('submit', async function(e)
             body: JSON.stringify(productData)
         });
         
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        // Vérifier si la réponse est du JSON
+        const contentType = response.headers.get('content-type');
+        console.log('Content-Type:', contentType);
+        
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.log('Response text (non-JSON):', text);
+            throw new Error('Le serveur a renvoyé une réponse non-JSON. Vérifiez la console du serveur.');
+        }
+        
         const result = await response.json();
+        console.log('Response JSON:', result);
         
         if (response.ok) {
             showMessage('Article publié avec succès !', 'success');
@@ -587,7 +610,7 @@ document.getElementById('sellForm').addEventListener('submit', async function(e)
             throw new Error(result.error || 'Erreur lors de la publication');
         }
     } catch (error) {
-        console.error('Erreur:', error);
+        console.error('Erreur complète:', error);
         showMessage('Erreur lors de la publication: ' + error.message, 'error');
     } finally {
         // Restaurer le bouton

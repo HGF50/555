@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détail du produit - Vinted Clone</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-left">
+                <h1 class="logo">Vinted</h1>
+            </div>
+            <div class="header-center">
+                <div class="search-bar" id="searchBar">
+                    <input type="text" id="searchInput" placeholder="Chercher des vêtements, accessoires...">
+                    <button onclick="toggleSearch()">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="icon-btn" onclick="showFavorites()">
+                    <i class="fas fa-heart"></i>
+                </button>
+                <button class="icon-btn" onclick="showProfile()">
+                    <i class="fas fa-user"></i>
+                </button>
+                <button class="icon-btn cart-btn" onclick="showCart()">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="cart-count">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Mobile -->
+    <nav class="mobile-nav">
+        <button class="nav-btn active" onclick="showHome()">
+            <i class="fas fa-home"></i>
+            <span>Accueil</span>
+        </button>
+        <button class="nav-btn" onclick="showCategories()">
+            <i class="fas fa-th-large"></i>
+            <span>Catégories</span>
+        </button>
+        <button class="nav-btn" onclick="showSellForm()">
+            <i class="fas fa-plus-circle"></i>
+            <span>Vendre</span>
+        </button>
+        <button class="nav-btn" onclick="showFavorites()">
+            <i class="fas fa-heart"></i>
+            <span>Favoris</span>
+        </button>
+        <button class="nav-btn" onclick="showProfile()">
+            <i class="fas fa-user"></i>
+            <span>Profil</span>
+        </button>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main class="container">
+        <div class="product-detail">
+            <div class="product-detail-container">
+                <div class="product-detail-images">
+                    <div class="main-image">
+                        <img id="productMainImage" src="" alt="">
+                    </div>
+                    <div class="thumbnail-list" id="productThumbnails">
+                        <!-- Miniatures générées dynamiquement -->
+                    </div>
+                </div>
+                
+                <div class="product-detail-info">
+                    <div class="product-detail-header">
+                        <h2 id="productTitle"></h2>
+                        <div class="product-detail-brand" id="productBrand"></div>
+                    </div>
+                    
+                    <div class="product-detail-price">
+                        <div class="current-price" id="productPrice"></div>
+                        <div class="original-price" id="productOriginalPrice"></div>
+                        <div class="protection-fees" id="productProtectionFees"></div>
+                        <div class="total-price" id="productTotalPrice"></div>
+                    </div>
+                    
+                    <div class="product-detail-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-ruler"></i>
+                            <span id="productSize"></span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-tag"></i>
+                            <span id="productCondition"></span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-eye"></i>
+                            <span id="productViews"></span> vues
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-heart"></i>
+                            <span id="productLikes"></span> likes
+                        </div>
+                    </div>
+                    
+                    <div class="product-detail-description">
+                        <h3>Description</h3>
+                        <p id="productDescription"></p>
+                    </div>
+                    
+                    <div class="product-detail-seller">
+                        <h3>Vendeur</h3>
+                        <div class="seller-info">
+                            <img id="productSellerAvatar" src="" alt="" class="seller-avatar">
+                            <div class="seller-details">
+                                <div class="seller-name" id="productSellerName"></div>
+                                <div class="seller-rating">
+                                    <i class="fas fa-star"></i>
+                                    <span id="productSellerRating"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="product-detail-actions">
+                        <button class="btn-primary btn-large" onclick="addToCart()">
+                            <i class="fas fa-shopping-cart"></i>
+                            Ajouter au panier
+                        </button>
+                        <button class="btn-secondary btn-large" onclick="toggleFavorite()">
+                            <i class="fas fa-heart"></i>
+                            <span id="favoriteText">Ajouter aux favoris</span>
+                        </button>
+                        <button class="btn-outline btn-large" onclick="contactSeller()">
+                            <i class="fas fa-envelope"></i>
+                            Contacter le vendeur
+                        </button>
+                        <button class="btn-outline btn-large" onclick="goBack()">
+                            <i class="fas fa-arrow-left"></i>
+                            Retour aux articles
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
+    <script src="product_detail.js"></script>
+</body>
+</html>

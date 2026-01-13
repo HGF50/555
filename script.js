@@ -25,6 +25,14 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Formulaire non trouvé!');
     }
     
+    // Vérifier si le modal existe
+    const sellModal = document.getElementById('sellModal');
+    if (sellModal) {
+        console.log('Modal de vente trouvé');
+    } else {
+        console.error('Modal de vente non trouvé!');
+    }
+    
     loadProducts();
     setupEventListeners();
     updateCartCount();
@@ -330,28 +338,28 @@ function renderProducts(append = false) {
     }
     
     const productsHTML = filteredProducts.map(product => `
-        <div class="product-card" onclick="showProductDetail('${product._id}')">
-            <div class="product-image">
-                <img src="${product.image}" alt="${product.title}" loading="lazy">
-                <button class="favorite-btn-product ${product.liked ? 'active' : ''}" 
-                        onclick="toggleFavorite(event, '${product._id}')">
-                    <i class="fas fa-heart"></i>
-                </button>
+    <div class="product-card" onclick="goToProductDetail('${product._id}')">
+        <div class="product-image">
+            <img src="${product.image}" alt="${product.title}" loading="lazy">
+            <button class="favorite-btn-product ${product.liked ? 'active' : ''}" 
+                    onclick="toggleFavorite(event, '${product._id}')">
+                <i class="fas fa-heart"></i>
+            </button>
+        </div>
+        <div class="product-info">
+            <div class="product-title">${product.title}</div>
+            <div class="product-brand">${product.brand}</div>
+            <div class="product-price">
+                ${product.price.toFixed(2)} FCFA
+                ${product.originalPrice ? `<span class="product-original-price">${product.originalPrice.toFixed(2)} FCFA</span>` : ''}
             </div>
-            <div class="product-info">
-                <div class="product-title">${product.title}</div>
-                <div class="product-brand">${product.brand}</div>
-                <div class="product-price">
-                    ${product.price.toFixed(2)} FCFA
-                    ${product.originalPrice ? `<span class="product-original-price">${product.originalPrice.toFixed(2)} FCFA</span>` : ''}
-                </div>
-                <div class="product-size">Taille: ${product.size}</div>
-                <div class="product-seller">
-                    <div class="seller-avatar"></div>
-                    <span>${product.seller.name} ⭐ ${product.seller.rating}</span>
-                </div>
+            <div class="product-size">Taille: ${product.size}</div>
+            <div class="product-seller">
+                <div class="seller-avatar"></div>
+                <span>${product.seller.name} ⭐ ${product.seller.rating}</span>
             </div>
         </div>
+    </div>
     `).join('');
     
     if (append) {
@@ -393,22 +401,15 @@ async function toggleFavorite(event, productId) {
     }
 }
 
-// Afficher détail produit
+// Afficher détail produit - Naviguer vers la page de détail
+function goToProductDetail(productId) {
+    window.location.href = `product.html?id=${productId}`;
+}
+
+// Afficher détail produit (ancienne fonction pour le modal)
 async function showProductDetail(productId) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/products/${productId}`);
-        const product = await response.json();
-        
-        if (response.ok) {
-            showMessage(`Détail de: ${product.title}`, 'info');
-            // Ici vous pourriez rediriger vers une page de détail
-        } else {
-            throw new Error(product.error);
-        }
-    } catch (error) {
-        console.error('Erreur:', error);
-        showMessage('Erreur lors du chargement du produit', 'error');
-    }
+    // Rediriger vers la page de détail
+    goToProductDetail(productId);
 }
 
 // Charger plus de produits
@@ -430,9 +431,17 @@ function showCategories() {
 }
 
 function showSellForm() {
+    console.log('showSellForm appelée');
+    alert('Bouton Vendre cliqué!');
+    
     const modal = document.getElementById('sellModal');
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
+    if (modal) {
+        console.log('Modal trouvé:', modal);
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    } else {
+        console.error('Modal non trouvé!');
+    }
 }
 
 // Fermer le modal de vente
@@ -652,23 +661,12 @@ function showFieldError(field, message) {
 }
 
 
-// Fermer le modal en cliquant sur l'overlay
-document.getElementById('sellModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeSellModal();
-    }
-});
+// Variables globales pour le modal
+let currentProduct = null;
+let currentImageIndex = 0;
 
-// Fermer le modal avec la touche Escape
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        const modal = document.getElementById('sellModal');
-        if (modal.classList.contains('active')) {
-            closeSellModal();
-        }
-    }
-});
-
+// Afficher les détails d'un produit
+async function showProductDetail(productId) {
 async function showFavorites() {
     try {
         const response = await fetch(`${API_BASE_URL}/products?category=favorites`);

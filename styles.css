@@ -840,6 +840,15 @@ body {
     background: rgba(0, 184, 148, 0.1);
 }
 
+.photo-slot.required {
+    border-color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.1);
+}
+
+.photo-slot.required .photo-placeholder {
+    color: #ff6b6b;
+}
+
 .photo-placeholder {
     display: flex;
     flex-direction: column;
@@ -919,7 +928,13 @@ body {
 }
 
 .price-input input {
-    padding-left: 32px !important;
+    padding-left: 60px !important;
+}
+
+.total-price {
+    background: #f8f9fa;
+    color: #00b894;
+    font-weight: 600;
 }
 
 /* Price Suggestions */

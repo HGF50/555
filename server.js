@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const mongoose = require('mongoose');
 const path = require('path');
 const helmet = require('helmet');
 const compression = require('compression');
@@ -31,71 +30,74 @@ app.use(express.urlencoded({ extended: true }));
 // Servir les fichiers statiques
 app.use(express.static(path.join(__dirname)));
 
-// Connexion MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/vinted-clone', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-.then(() => console.log('Connecté à MongoDB'))
-.catch(err => console.error('Erreur de connexion MongoDB:', err));
+// Base de données en mémoire (temporaire)
+let products = [
+    {
+        _id: '1',
+        title: "Robe d'été florale",
+        brand: "Zara",
+        price: 25.99,
+        originalPrice: 59.99,
+        size: "M",
+        condition: "Bon état",
+        category: "women",
+        image: "https://picsum.photos/seed/robe1/300/400",
+        seller: {
+            name: "Marie",
+            rating: 4.8,
+            avatar: "https://picsum.photos/seed/marie/50/50"
+        },
+        likes: 24,
+        description: "Belle robe d'été imprimée floral, portée quelques fois seulement.",
+        status: 'available',
+        createdAt: new Date(),
+        updatedAt: new Date()
+    },
+    {
+        _id: '2',
+        title: "Jean slim fit noir",
+        brand: "H&M",
+        price: 19.99,
+        originalPrice: 39.99,
+        size: "L",
+        condition: "Comme neuf",
+        category: "men",
+        image: "https://picsum.photos/seed/jean1/300/400",
+        seller: {
+            name: "Pierre",
+            rating: 4.9,
+            avatar: "https://picsum.photos/seed/pierre/50/50"
+        },
+        likes: 18,
+        description: "Jean slim fit noir, parfait pour toutes occasions.",
+        status: 'available',
+        createdAt: new Date(),
+        updatedAt: new Date()
+    },
+    {
+        _id: '3',
+        title: "Sac à main en cuir",
+        brand: "Mango",
+        price: 45.00,
+        originalPrice: 89.99,
+        size: "Unique",
+        condition: "Neuf",
+        category: "accessories",
+        image: "https://picsum.photos/seed/sac1/300/400",
+        seller: {
+            name: "Sophie",
+            rating: 4.7,
+            avatar: "https://picsum.photos/seed/sophie/50/50"
+        },
+        likes: 32,
+        description: "Magnifique sac à main en cuir véritable, jamais utilisé.",
+        status: 'available',
+        createdAt: new Date(),
+        updatedAt: new Date()
+    }
+];
 
-// Schémas Mongoose
-const productSchema = new mongoose.Schema({
-    title: { type: String, required: true, trim: true },
-    brand: { type: String, required: true, trim: true },
-    price: { type: Number, required: true, min: 0 },
-    originalPrice: { type: Number, min: 0 },
-    size: { type: String, required: true },
-    condition: { 
-        type: String, 
-        enum: ['Neuf', 'Comme neuf', 'Bon état', 'Acceptable'],
-        required: true 
-    },
-    category: { 
-        type: String, 
-        enum: ['women', 'men', 'kids', 'accessories', 'shoes', 'bags'],
-        required: true 
-    },
-    image: { type: String, required: true },
-    images: [{ type: String }],
-    description: { type: String, trim: true },
-    seller: { 
-        name: { type: String, required: true },
-        rating: { type: Number, min: 0, max: 5, default: 0 },
-        avatar: { type: String }
-    },
-    likes: { type: Number, default: 0 },
-    likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    views: { type: Number, default: 0 },
-    status: { 
-        type: String, 
-        enum: ['available', 'sold', 'reserved'],
-        default: 'available' 
-    },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
-});
-
-const userSchema = new mongoose.Schema({
-    username: { type: String, required: true, unique: true, trim: true },
-    email: { type: String, required: true, unique: true, trim: true },
-    password: { type: String, required: true },
-    firstName: { type: String, required: true, trim: true },
-    lastName: { type: String, required: true, trim: true },
-    avatar: { type: String },
-    phone: { type: String },
-    location: {
-        city: { type: String },
-        country: { type: String }
-    },
-    rating: { type: Number, min: 0, max: 5, default: 0 },
-    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
-    favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
-    createdAt: { type: Date, default: Date.now }
-});
-
-const Product = mongoose.model('Product', productSchema);
-const User = mongoose.model('User', userSchema);
+let nextId = 4;
 
 // Routes API
 // GET tous les produits
@@ -113,59 +115,72 @@ app.get('/api/products', async (req, res) => {
             search 
         } = req.query;
 
-        const query = { status: 'available' };
+        let filteredProducts = products.filter(p => p.status === 'available');
 
         // Filtres
-        if (category && category !== 'all') query.category = category;
-        if (minPrice || maxPrice) {
-            query.price = {};
-            if (minPrice) query.price.$gte = parseFloat(minPrice);
-            if (maxPrice) query.price.$lte = parseFloat(maxPrice);
+        if (category && category !== 'all') {
+            filteredProducts = filteredProducts.filter(p => p.category === category);
         }
-        if (size) query.size = size;
-        if (condition) query.condition = condition;
+        
+        if (minPrice || maxPrice) {
+            const min = parseFloat(minPrice) || 0;
+            const max = parseFloat(maxPrice) || Infinity;
+            filteredProducts = filteredProducts.filter(p => p.price >= min && p.price <= max);
+        }
+        
+        if (size) {
+            filteredProducts = filteredProducts.filter(p => p.size === size);
+        }
+        
+        if (condition) {
+            filteredProducts = filteredProducts.filter(p => 
+                p.condition.toLowerCase() === condition.toLowerCase()
+            );
+        }
+        
         if (search) {
-            query.$or = [
-                { title: { $regex: search, $options: 'i' } },
-                { brand: { $regex: search, $options: 'i' } },
-                { description: { $regex: search, $options: 'i' } }
-            ];
+            const searchLower = search.toLowerCase();
+            filteredProducts = filteredProducts.filter(p => 
+                p.title.toLowerCase().includes(searchLower) ||
+                p.brand.toLowerCase().includes(searchLower) ||
+                p.description.toLowerCase().includes(searchLower)
+            );
         }
 
         // Tri
-        let sortOptions = {};
-        switch (sort) {
+        let sortedProducts = [...filteredProducts];
+        switch(sort) {
             case 'price-low':
-                sortOptions.price = 1;
+                sortedProducts.sort((a, b) => a.price - b.price);
                 break;
             case 'price-high':
-                sortOptions.price = -1;
+                sortedProducts.sort((a, b) => b.price - a.price);
                 break;
             case 'newest':
-                sortOptions.createdAt = -1;
+                sortedProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 break;
             case 'popular':
-                sortOptions.likes = -1;
+                sortedProducts.sort((a, b) => b.likes - a.likes);
                 break;
-            default:
-                sortOptions.likes = -1;
+            default: // relevant
+                sortedProducts.sort((a, b) => b.likes - a.likes);
         }
 
-        const products = await Product.find(query)
-            .sort(sortOptions)
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-            .exec();
+        // Pagination
+        const startIndex = (page - 1) * limit;
+        const endIndex = startIndex + parseInt(limit);
+        const paginatedProducts = sortedProducts.slice(startIndex, endIndex);
 
-        const total = await Product.countDocuments(query);
+        const total = sortedProducts.length;
 
         res.json({
-            products,
+            products: paginatedProducts,
             totalPages: Math.ceil(total / limit),
-            currentPage: page,
+            currentPage: parseInt(page),
             total
         });
     } catch (error) {
+        console.error('Erreur GET /api/products:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -173,17 +188,17 @@ app.get('/api/products', async (req, res) => {
 // GET un produit par ID
 app.get('/api/products/:id', async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const product = products.find(p => p._id === req.params.id);
         if (!product) {
             return res.status(404).json({ error: 'Produit non trouvé' });
         }
         
         // Incrémenter les vues
-        product.views += 1;
-        await product.save();
+        product.views = (product.views || 0) + 1;
         
         res.json(product);
     } catch (error) {
+        console.error('Erreur GET /api/products/:id:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -191,10 +206,23 @@ app.get('/api/products/:id', async (req, res) => {
 // POST créer un produit
 app.post('/api/products', async (req, res) => {
     try {
-        const product = new Product(req.body);
-        await product.save();
-        res.status(201).json(product);
+        const productData = {
+            _id: nextId.toString(),
+            ...req.body,
+            status: 'available',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            likes: 0,
+            views: 0
+        };
+        
+        products.push(productData);
+        nextId++;
+        
+        console.log('Produit créé:', productData);
+        res.status(201).json(productData);
     } catch (error) {
+        console.error('Erreur POST /api/products:', error);
         res.status(400).json({ error: error.message });
     }
 });
@@ -202,16 +230,20 @@ app.post('/api/products', async (req, res) => {
 // PUT mettre à jour un produit
 app.put('/api/products/:id', async (req, res) => {
     try {
-        const product = await Product.findByIdAndUpdate(
-            req.params.id, 
-            req.body, 
-            { new: true, runValidators: true }
-        );
-        if (!product) {
+        const index = products.findIndex(p => p._id === req.params.id);
+        if (index === -1) {
             return res.status(404).json({ error: 'Produit non trouvé' });
         }
-        res.json(product);
+        
+        products[index] = {
+            ...products[index],
+            ...req.body,
+            updatedAt: new Date()
+        };
+        
+        res.json(products[index]);
     } catch (error) {
+        console.error('Erreur PUT /api/products/:id:', error);
         res.status(400).json({ error: error.message });
     }
 });
@@ -219,12 +251,15 @@ app.put('/api/products/:id', async (req, res) => {
 // DELETE supprimer un produit
 app.delete('/api/products/:id', async (req, res) => {
     try {
-        const product = await Product.findByIdAndDelete(req.params.id);
-        if (!product) {
+        const index = products.findIndex(p => p._id === req.params.id);
+        if (index === -1) {
             return res.status(404).json({ error: 'Produit non trouvé' });
         }
+        
+        products.splice(index, 1);
         res.json({ message: 'Produit supprimé' });
     } catch (error) {
+        console.error('Erreur DELETE /api/products/:id:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -232,26 +267,34 @@ app.delete('/api/products/:id', async (req, res) => {
 // POST like/unlike un produit
 app.post('/api/products/:id/like', async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const product = products.find(p => p._id === req.params.id);
         if (!product) {
             return res.status(404).json({ error: 'Produit non trouvé' });
         }
 
-        const userId = req.body.userId; // À remplacer par l'ID utilisateur authentifié
+        const userId = req.body.userId || 'demo-user';
+        const isLiked = product.likedBy && product.likedBy.includes(userId);
         
-        const isLiked = product.likedBy.includes(userId);
+        if (!product.likedBy) {
+            product.likedBy = [];
+        }
         
         if (isLiked) {
-            product.likedBy.pull(userId);
+            product.likedBy = product.likedBy.filter(id => id !== userId);
             product.likes = Math.max(0, product.likes - 1);
         } else {
             product.likedBy.push(userId);
-            product.likes += 1;
+            product.likes = (product.likes || 0) + 1;
         }
         
-        await product.save();
-        res.json({ liked: !isLiked, likes: product.likes });
+        product.updatedAt = new Date();
+        
+        res.json({ 
+            liked: !isLiked, 
+            likes: product.likes 
+        });
     } catch (error) {
+        console.error('Erreur POST /api/products/:id/like:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -259,9 +302,10 @@ app.post('/api/products/:id/like', async (req, res) => {
 // GET catégories
 app.get('/api/categories', async (req, res) => {
     try {
-        const categories = await Product.distinct('category');
+        const categories = [...new Set(products.map(p => p.category))];
         res.json(categories);
     } catch (error) {
+        console.error('Erreur GET /api/categories:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -269,20 +313,16 @@ app.get('/api/categories', async (req, res) => {
 // GET statistiques
 app.get('/api/stats', async (req, res) => {
     try {
-        const stats = await Promise.all([
-            Product.countDocuments({ status: 'available' }),
-            Product.countDocuments({ status: 'sold' }),
-            Product.countDocuments(),
-            User.countDocuments()
-        ]);
+        const stats = {
+            availableProducts: products.filter(p => p.status === 'available').length,
+            soldProducts: products.filter(p => p.status === 'sold').length,
+            totalProducts: products.length,
+            totalUsers: 1 // Simulation
+        };
 
-        res.json({
-            availableProducts: stats[0],
-            soldProducts: stats[1],
-            totalProducts: stats[2],
-            totalUsers: stats[3]
-        });
+        res.json(stats);
     } catch (error) {
+        console.error('Erreur GET /api/stats:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -294,7 +334,7 @@ app.get('/', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-    console.error(err.stack);
+    console.error('Erreur middleware:', err.stack);
     res.status(500).json({ error: 'Something went wrong!' });
 });
 
@@ -307,76 +347,7 @@ app.use((req, res) => {
 app.listen(PORT, () => {
     console.log(`Serveur démarré sur le port ${PORT}`);
     console.log(`URL: http://localhost:${PORT}`);
+    console.log('Base de données: Mode mémoire (temporaire)');
 });
-
-// Initialisation des données de démonstration
-async function initializeData() {
-    try {
-        const count = await Product.countDocuments();
-        if (count === 0) {
-            const sampleProducts = [
-                {
-                    title: "Robe d'été florale",
-                    brand: "Zara",
-                    price: 25.99,
-                    originalPrice: 59.99,
-                    size: "M",
-                    condition: "Bon état",
-                    category: "women",
-                    image: "https://picsum.photos/seed/robe1/300/400",
-                    seller: {
-                        name: "Marie",
-                        rating: 4.8,
-                        avatar: "https://picsum.photos/seed/marie/50/50"
-                    },
-                    likes: 24,
-                    description: "Belle robe d'été imprimée floral, portée quelques fois seulement."
-                },
-                {
-                    title: "Jean slim fit noir",
-                    brand: "H&M",
-                    price: 19.99,
-                    originalPrice: 39.99,
-                    size: "L",
-                    condition: "Comme neuf",
-                    category: "men",
-                    image: "https://picsum.photos/seed/jean1/300/400",
-                    seller: {
-                        name: "Pierre",
-                        rating: 4.9,
-                        avatar: "https://picsum.photos/seed/pierre/50/50"
-                    },
-                    likes: 18,
-                    description: "Jean slim fit noir, parfait pour toutes occasions."
-                },
-                {
-                    title: "Sac à main en cuir",
-                    brand: "Mango",
-                    price: 45.00,
-                    originalPrice: 89.99,
-                    size: "Unique",
-                    condition: "Neuf",
-                    category: "accessories",
-                    image: "https://picsum.photos/seed/sac1/300/400",
-                    seller: {
-                        name: "Sophie",
-                        rating: 4.7,
-                        avatar: "https://picsum.photos/seed/sophie/50/50"
-                    },
-                    likes: 32,
-                    description: "Magnifique sac à main en cuir véritable, jamais utilisé."
-                }
-            ];
-
-            await Product.insertMany(sampleProducts);
-            console.log('Données de démonstration insérées');
-        }
-    } catch (error) {
-        console.error('Erreur lors de l\'initialisation:', error);
-    }
-}
-
-// Initialiser les données au démarrage
-initializeData();
 
 module.exports = app;

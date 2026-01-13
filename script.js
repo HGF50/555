@@ -15,6 +15,13 @@ document.addEventListener('DOMContentLoaded', function() {
     loadProducts();
     setupEventListeners();
     updateCartCount();
+    
+    // Initialiser le calcul du prix total
+    const priceInput = document.getElementById('price');
+    if (priceInput) {
+        priceInput.addEventListener('input', updateTotalPrice);
+        updateTotalPrice(); // Calcul initial
+    }
 });
 
 // Configuration des écouteurs d'événements
@@ -202,8 +209,8 @@ function renderProducts(append = false) {
                 <div class="product-title">${product.title}</div>
                 <div class="product-brand">${product.brand}</div>
                 <div class="product-price">
-                    ${product.price.toFixed(2)}€
-                    ${product.originalPrice ? `<span class="product-original-price">${product.originalPrice.toFixed(2)}€</span>` : ''}
+                    ${product.price.toFixed(2)} FCFA
+                    ${product.originalPrice ? `<span class="product-original-price">${product.originalPrice.toFixed(2)} FCFA</span>` : ''}
                 </div>
                 <div class="product-size">Taille: ${product.size}</div>
                 <div class="product-seller">
@@ -337,6 +344,8 @@ function handlePhotoUpload(event) {
                     url: e.target.result,
                     index: slotIndex
                 });
+                
+                updatePhotoRequirements();
             }
         };
         reader.readAsDataURL(file);
@@ -359,6 +368,56 @@ function removePhoto(event, index) {
     removeBtn.style.display = 'none';
     
     uploadedPhotos = uploadedPhotos.filter(photo => photo.index !== index);
+    
+    // Réorganiser les photos restantes
+    reorganizePhotos();
+    updatePhotoRequirements();
+}
+
+function reorganizePhotos() {
+    const photoGrid = document.getElementById('photoGrid');
+    const slots = photoGrid.querySelectorAll('.photo-slot');
+    
+    // Vider tous les slots
+    slots.forEach(slot => {
+        const img = slot.querySelector('.preview-image');
+        const placeholder = slot.querySelector('.photo-placeholder');
+        const removeBtn = slot.querySelector('.remove-photo');
+        
+        img.style.display = 'none';
+        placeholder.style.display = 'flex';
+        removeBtn.style.display = 'none';
+    });
+    
+    // Remplir avec les photos restantes
+    uploadedPhotos.forEach((photo, index) => {
+        const slot = slots[index];
+        if (slot) {
+            const img = slot.querySelector('.preview-image');
+            const placeholder = slot.querySelector('.photo-placeholder');
+            const removeBtn = slot.querySelector('.remove-photo');
+            
+            img.src = photo.url;
+            img.style.display = 'block';
+            placeholder.style.display = 'none';
+            removeBtn.style.display = 'flex';
+            
+            photo.index = index;
+        }
+    });
+}
+
+function updatePhotoRequirements() {
+    const photoGrid = document.getElementById('photoGrid');
+    const slots = photoGrid.querySelectorAll('.photo-slot');
+    
+    slots.forEach((slot, index) => {
+        if (index < 3 && !slot.querySelector('.preview-image').style.display || slot.querySelector('.preview-image').style.display === 'none') {
+            slot.classList.add('required');
+        } else {
+            slot.classList.remove('required');
+        }
+    });
 }
 
 function clearPhotoPreviews() {
@@ -372,12 +431,27 @@ function clearPhotoPreviews() {
         img.style.display = 'none';
         placeholder.style.display = 'flex';
         removeBtn.style.display = 'none';
+        slot.classList.remove('required');
     });
 }
 
 // Suggestions de prix
 function setPrice(price) {
     document.getElementById('price').value = price;
+    updateTotalPrice();
+}
+
+// Calculer le prix total avec frais de protection
+function updateTotalPrice() {
+    const priceInput = document.getElementById('price');
+    const totalPriceInput = document.getElementById('totalPrice');
+    const price = parseFloat(priceInput.value) || 0;
+    
+    // Frais de protection de 5%
+    const protectionFees = Math.round(price * 0.05);
+    const totalPrice = price + protectionFees;
+    
+    totalPriceInput.value = totalPrice;
 }
 
 // Validation du formulaire
@@ -407,16 +481,16 @@ function validateForm() {
     });
     
     // Validation des photos
-    if (uploadedPhotos.length === 0) {
-        showMessage('Veuillez ajouter au moins une photo', 'error');
+    if (uploadedPhotos.length < 3) {
+        showMessage('Veuillez ajouter au moins 3 photos', 'error');
         isValid = false;
     }
     
     // Validation du prix
     const price = parseFloat(formData.get('price'));
-    if (price < 1 || price > 10000) {
+    if (price < 200 || price > 1000000) {
         const priceField = document.getElementById('price');
-        showFieldError(priceField, 'Le prix doit être entre 1€ et 10 000€');
+        showFieldError(priceField, 'Le prix doit être entre 200 FCFA et 1 000 000 FCFA');
         isValid = false;
     }
     
@@ -463,10 +537,14 @@ document.getElementById('sellForm').addEventListener('submit', async function(e)
     };
     
     // Préparer les données pour l'API
+    const price = parseFloat(formData.get('price'));
+    const protectionFees = Math.round(price * 0.05);
+    const totalPrice = price + protectionFees;
+    
     const productData = {
         title: formData.get('title'),
         brand: formData.get('brand'),
-        price: parseFloat(formData.get('price')),
+        price: price,
         originalPrice: formData.get('originalPrice') ? parseFloat(formData.get('originalPrice')) : null,
         size: formData.get('size'),
         condition: formData.get('condition'),
@@ -474,7 +552,9 @@ document.getElementById('sellForm').addEventListener('submit', async function(e)
         description: formData.get('description'),
         seller: sellerInfo,
         images: uploadedPhotos.map(photo => photo.url),
-        image: uploadedPhotos.length > 0 ? uploadedPhotos[0].url : 'https://picsum.photos/seed/default/300/400'
+        image: uploadedPhotos.length > 0 ? uploadedPhotos[0].url : 'https://picsum.photos/seed/default/300/400',
+        protectionFees: protectionFees,
+        totalPrice: totalPrice
     };
     
     // Afficher l'état de chargement

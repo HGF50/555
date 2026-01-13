@@ -1,5 +1,5 @@
 // Configuration de l'API
-const API_BASE_URL = window.location.origin + '/api';
+const API_BASE_URL = 'http://localhost:3001/api';
 
 // Variables globales
 let currentCategory = 'all';

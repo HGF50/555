@@ -7,10 +7,10 @@ const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(helmet());
+// app.use(helmet()); // Désactivé temporairement pour éviter les problèmes de fichiers statiques
 app.use(compression());
 app.use(cors({
     origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://yourdomain.com'],

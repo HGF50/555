@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vinted Clone - Achetez et vendez des vêtements</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header Mobile -->
+    <header class="header">
+        <div class="header-top">
+            <div class="logo">
+                <i class="fas fa-shopping-bag"></i>
+                <span>Vinted</span>
+            </div>
+            <div class="header-actions">
+                <button class="search-btn" onclick="toggleSearch()">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button class="favorite-btn">
+                    <i class="fas fa-heart"></i>
+                </button>
+                <button class="cart-btn">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Barre de recherche cachée -->
+        <div class="search-bar" id="searchBar">
+            <input type="text" placeholder="Rechercher des articles..." id="searchInput">
+            <button onclick="performSearch()">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        
+        <!-- Navigation par catégories -->
+        <nav class="category-nav">
+            <div class="category-scroll">
+                <button class="category-btn active" data-category="all">Tout</button>
+                <button class="category-btn" data-category="women">Femmes</button>
+                <button class="category-btn" data-category="men">Hommes</button>
+                <button class="category-btn" data-category="kids">Enfants</button>
+                <button class="category-btn" data-category="accessories">Accessoires</button>
+                <button class="category-btn" data-category="shoes">Chaussures</button>
+                <button class="category-btn" data-category="bags">Sacs</button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Filtres -->
+    <div class="filter-section">
+        <button class="filter-btn" onclick="toggleFilters()">
+            <i class="fas fa-filter"></i>
+            Filtres
+        </button>
+        <div class="sort-options">
+            <select id="sortSelect" onchange="sortProducts()">
+                <option value="relevant">Plus pertinents</option>
+                <option value="price-low">Prix croissant</option>
+                <option value="price-high">Prix décroissant</option>
+                <option value="newest">Plus récents</option>
+                <option value="popular">Plus populaires</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Panneau de filtres -->
+    <div class="filter-panel" id="filterPanel">
+        <div class="filter-header">
+            <h3>Filtres</h3>
+            <button class="close-filters" onclick="toggleFilters()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="filter-content">
+            <div class="filter-group">
+                <h4>Prix</h4>
+                <div class="price-range">
+                    <input type="number" placeholder="Min" id="minPrice">
+                    <span>-</span>
+                    <input type="number" placeholder="Max" id="maxPrice">
+                </div>
+            </div>
+            <div class="filter-group">
+                <h4>Taille</h4>
+                <div class="size-options">
+                    <label><input type="checkbox" value="XS"> XS</label>
+                    <label><input type="checkbox" value="S"> S</label>
+                    <label><input type="checkbox" value="M"> M</label>
+                    <label><input type="checkbox" value="L"> L</label>
+                    <label><input type="checkbox" value="XL"> XL</label>
+                    <label><input type="checkbox" value="XXL"> XXL</label>
+                </div>
+            </div>
+            <div class="filter-group">
+                <h4>État</h4>
+                <div class="condition-options">
+                    <label><input type="checkbox" value="new"> Neuf</label>
+                    <label><input type="checkbox" value="like-new"> Comme neuf</label>
+                    <label><input type="checkbox" value="good"> Bon état</label>
+                    <label><input type="checkbox" value="acceptable"> Acceptable</label>
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button class="apply-filters" onclick="applyFilters()">Appliquer</button>
+                <button class="reset-filters" onclick="resetFilters()">Réinitialiser</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenu principal -->
+    <main class="main-content">
+        <div class="products-grid" id="productsGrid">
+            <!-- Les produits seront chargés ici via JavaScript -->
+        </div>
+        
+        <!-- Bouton charger plus -->
+        <div class="load-more-container">
+            <button class="load-more-btn" onclick="loadMoreProducts()">
+                Charger plus d'articles
+            </button>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation Mobile -->
+    <nav class="bottom-nav">
+        <button class="nav-btn active" onclick="showHome()">
+            <i class="fas fa-home"></i>
+            <span>Accueil</span>
+        </button>
+        <button class="nav-btn" onclick="showCategories()">
+            <i class="fas fa-th-large"></i>
+            <span>Catégories</span>
+        </button>
+        <button class="nav-btn sell-btn" onclick="showSellForm()">
+            <i class="fas fa-plus"></i>
+            <span>Vendre</span>
+        </button>
+        <button class="nav-btn" onclick="showFavorites()">
+            <i class="fas fa-heart"></i>
+            <span>Favoris</span>
+        </button>
+        <button class="nav-btn" onclick="showProfile()">
+            <i class="fas fa-user"></i>
+            <span>Profil</span>
+        </button>
+    </nav>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Vinted</h4>
+                <ul>
+                    <li><a href="#">À propos</a></li>
+                    <li><a href="#">Carrières</a></li>
+                    <li><a href="#">Presse</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Aide</h4>
+                <ul>
+                    <li><a href="#">Centre d'aide</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Sécurité</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Légal</h4>
+                <ul>
+                    <li><a href="#">Conditions d'utilisation</a></li>
+                    <li><a href="#">Confidentialité</a></li>
+                    <li><a href="#">Cookies</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Vinted Clone. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <!-- Modal Formulaire de Vente -->
+    <div class="modal-overlay" id="sellModal">
+        <div class="modal-content sell-modal">
+            <div class="modal-header">
+                <h2>Vends un article</h2>
+                <button class="close-modal" onclick="closeSellModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="sellForm" class="sell-form">
+                <!-- Upload Photos -->
+                <div class="form-section">
+                    <h3>Photos</h3>
+                    <div class="photo-upload-area">
+                        <div class="photo-grid" id="photoGrid">
+                            <div class="photo-slot main-photo" onclick="document.getElementById('photoInput').click()">
+                                <div class="photo-placeholder">
+                                    <i class="fas fa-camera"></i>
+                                    <span>Ajouter une photo</span>
+                                    <small>Photo principale</small>
+                                </div>
+                                <img class="preview-image" style="display: none;">
+                                <button type="button" class="remove-photo" style="display: none;" onclick="removePhoto(event, 0)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="photo-slot" onclick="document.getElementById('photoInput').click()">
+                                <div class="photo-placeholder">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Ajouter</span>
+                                </div>
+                                <img class="preview-image" style="display: none;">
+                                <button type="button" class="remove-photo" style="display: none;" onclick="removePhoto(event, 1)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="photo-slot" onclick="document.getElementById('photoInput').click()">
+                                <div class="photo-placeholder">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Ajouter</span>
+                                </div>
+                                <img class="preview-image" style="display: none;">
+                                <button type="button" class="remove-photo" style="display: none;" onclick="removePhoto(event, 2)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="photo-slot" onclick="document.getElementById('photoInput').click()">
+                                <div class="photo-placeholder">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Ajouter</span>
+                                </div>
+                                <img class="preview-image" style="display: none;">
+                                <button type="button" class="remove-photo" style="display: none;" onclick="removePhoto(event, 3)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <input type="file" id="photoInput" accept="image/*" multiple style="display: none;" onchange="handlePhotoUpload(event)">
+                        <small class="photo-hint">Ajoutez jusqu'à 20 photos. La première sera la photo principale.</small>
+                    </div>
+                </div>
+
+                <!-- Informations sur l'article -->
+                <div class="form-section">
+                    <h3>Informations sur l'article</h3>
+                    
+                    <div class="form-group">
+                        <label for="title">Titre *</label>
+                        <input type="text" id="title" name="title" required maxlength="100" placeholder="Ex: Robe d'été florale taille M">
+                        <small>Sois précis et inclus la marque, la taille, et les détails importants.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="brand">Marque *</label>
+                        <input type="text" id="brand" name="brand" required placeholder="Ex: Zara, H&M, Nike...">
+                        <small>Si tu ne connais pas la marque, mets "Sans marque".</small>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="category">Catégorie *</label>
+                            <select id="category" name="category" required>
+                                <option value="">Sélectionne une catégorie</option>
+                                <option value="women">Femmes</option>
+                                <option value="men">Hommes</option>
+                                <option value="kids">Enfants</option>
+                                <option value="accessories">Accessoires</option>
+                                <option value="shoes">Chaussures</option>
+                                <option value="bags">Sacs</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="size">Taille *</label>
+                            <select id="size" name="size" required>
+                                <option value="">Sélectionne une taille</option>
+                                <option value="XS">XS</option>
+                                <option value="S">S</option>
+                                <option value="M">M</option>
+                                <option value="L">L</option>
+                                <option value="XL">XL</option>
+                                <option value="XXL">XXL</option>
+                                <option value="Unique">Unique</option>
+                                <option value="34">34</option>
+                                <option value="36">36</option>
+                                <option value="38">38</option>
+                                <option value="40">40</option>
+                                <option value="42">42</option>
+                                <option value="44">44</option>
+                                <option value="46">46</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="condition">État *</label>
+                        <select id="condition" name="condition" required>
+                            <option value="">Sélectionne l'état</option>
+                            <option value="Neuf">Neuf</option>
+                            <option value="Comme neuf">Comme neuf</option>
+                            <option value="Bon état">Bon état</option>
+                            <option value="Acceptable">Acceptable</option>
+                        </select>
+                        <small>Sois honnête sur l'état de ton article.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" rows="4" maxlength="1000" placeholder="Décris ton article en détail..."></textarea>
+                        <small>Décris les détails, les défauts, la matière, l'ajustement...</small>
+                    </div>
+                </div>
+
+                <!-- Prix -->
+                <div class="form-section">
+                    <h3>Prix</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="price">Prix de vente *</label>
+                            <div class="price-input">
+                                <span class="currency">€</span>
+                                <input type="number" id="price" name="price" required min="1" max="10000" step="0.01" placeholder="0.00">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="originalPrice">Prix d'origine</label>
+                            <div class="price-input">
+                                <span class="currency">€</span>
+                                <input type="number" id="originalPrice" name="originalPrice" min="0" max="10000" step="0.01" placeholder="0.00">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="price-suggestions">
+                        <p>Suggestions de prix basées sur des articles similaires :</p>
+                        <div class="suggestion-chips">
+                            <button type="button" class="suggestion-chip" onclick="setPrice(15)">€15</button>
+                            <button type="button" class="suggestion-chip" onclick="setPrice(25)">€25</button>
+                            <button type="button" class="suggestion-chip" onclick="setPrice(35)">€35</button>
+                            <button type="button" class="suggestion-chip" onclick="setPrice(50)">€50</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Options de vente -->
+                <div class="form-section">
+                    <h3>Options de vente</h3>
+                    
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="acceptSwap" name="acceptSwap">
+                            <span class="checkmark"></span>
+                            J'accepte les échanges
+                        </label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="acceptProtection" name="acceptProtection" checked>
+                            <span class="checkmark"></span>
+                            Activer la protection acheteur Vinted (+5%)
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeSellModal()">Annuler</button>
+                    <button type="submit" class="btn-primary">Publier l'article</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -327,31 +327,20 @@
                             <label for="price">Prix de vente *</label>
                             <div class="price-input">
                                 <span class="currency">FCFA</span>
-                                <input type="number" id="price" name="price" required min="200" max="1000000" step="50" placeholder="200" value="200">
+                                <input type="number" id="price" name="price" required min="1" max="1000000" step="50" placeholder="Entrez votre prix">
                             </div>
-                            <small>Prix minimum obligatoire : 200 FCFA</small>
+                            <small>Fixez votre prix librement</small>
                         </div>
 
                         <div class="form-group">
                             <label for="totalPrice">Prix total avec frais de protection</label>
                             <div class="price-input">
                                 <span class="currency">FCFA</span>
-                                <input type="number" id="totalPrice" readonly class="total-price" value="210">
+                                <input type="number" id="totalPrice" readonly class="total-price" value="200">
                             </div>
-                            <small>Frais de protection (5%) inclus automatiquement</small>
+                            <small>Frais de protection fixes : 200 FCFA</small>
                         </div>
                     </div>
-
-                    <div class="price-suggestions">
-                        <p>Suggestions de prix basées sur des articles similaires :</p>
-                        <div class="suggestion-chips">
-                            <button type="button" class="suggestion-chip" onclick="setPrice(200)">200 FCFA</button>
-                            <button type="button" class="suggestion-chip" onclick="setPrice(500)">500 FCFA</button>
-                            <button type="button" class="suggestion-chip" onclick="setPrice(1000)">1000 FCFA</button>
-                            <button type="button" class="suggestion-chip" onclick="setPrice(2000)">2000 FCFA</button>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Options de vente -->
                 <div class="form-section">
@@ -369,7 +358,7 @@
                         <label class="checkbox-label">
                             <input type="checkbox" id="acceptProtection" name="acceptProtection" checked disabled>
                             <span class="checkmark"></span>
-                            Protection acheteur incluse (5% du prix)
+                            Frais de protection inclus (200 FCFA fixes)
                         </label>
                     </div>
                 </div>
@@ -377,13 +366,13 @@
                 <!-- Actions -->
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" onclick="closeSellModal()">Annuler</button>
-                    <button type="submit" class="btn-primary">Publier l'article</button>
+                    <button type="button" class="btn-primary" onclick="submitForm()">Publier l'article</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
-    <script src="script.js"></script>
+    <script src="script_simple.js"></script>
 </body>
 </html>

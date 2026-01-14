@@ -9,48 +9,80 @@ let cart = [];
 let favorites = [];
 let currentPage = 1;
 let isLoading = false;
+let uploadedPhotos = [];
 
-// Initialisation au chargement de la page
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM chargé, initialisation...');
+// Fonction simple pour ouvrir le modal de vente
+function showSellForm() {
+    console.log('Bouton Vendre cliqué!');
     
-    // Vérifier si le formulaire existe
-    const sellForm = document.getElementById('sellForm');
-    if (sellForm) {
-        console.log('Formulaire trouvé, ajout des écouteurs');
+    const modal = document.getElementById('sellModal');
+    if (modal) {
+        console.log('Modal trouvé, affichage...');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    } else {
+        console.error('Modal non trouvé!');
+        alert('Modal non trouvé!');
+    }
+}
+
+// Fonction pour fermer le modal de vente
+function closeSellModal() {
+    console.log('Fermeture du modal...');
+    
+    const modal = document.getElementById('sellModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
         
-        // Ajouter l'écouteur d'événement de soumission
-        sellForm.addEventListener('submit', handleFormSubmit);
-    } else {
-        console.error('Formulaire non trouvé!');
+        // Réinitialiser le formulaire
+        const form = document.getElementById('sellForm');
+        if (form) {
+            form.reset();
+        }
+        clearPhotoPreviews();
     }
+}
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM chargé - Initialisation');
     
-    // Vérifier si le modal existe
+    // Vérifier les éléments
     const sellModal = document.getElementById('sellModal');
-    if (sellModal) {
-        console.log('Modal de vente trouvé');
-    } else {
-        console.error('Modal de vente non trouvé!');
+    const sellBtn = document.querySelector('.sell-btn');
+    const sellForm = document.getElementById('sellForm');
+    
+    console.log('Modal trouvé:', !!sellModal);
+    console.log('Bouton vendre trouvé:', !!sellBtn);
+    console.log('Formulaire trouvé:', !!sellForm);
+    
+    // Ajouter l'écouteur d'événement au formulaire
+    if (sellForm) {
+        sellForm.addEventListener('submit', handleFormSubmit);
+        console.log('Écouteur de soumission ajouté au formulaire');
     }
     
+    // Charger les produits
     loadProducts();
     setupEventListeners();
     updateCartCount();
     
-    // Initialiser le calcul du prix total
+    // Initialiser le calcul du prix
     const priceInput = document.getElementById('price');
     if (priceInput) {
         priceInput.addEventListener('input', updateTotalPrice);
-        updateTotalPrice(); // Calcul initial
+        updateTotalPrice();
     }
 });
 
-// Fonction de soumission du formulaire séparée
+// Fonction de soumission du formulaire
 async function handleFormSubmit(e) {
     e.preventDefault();
     
     console.log('=== SOUMISSION DU FORMULAIRE ===');
-    console.log('Début de la soumission du formulaire');
+    console.log('handleFormSubmit appelée!');
+    console.log('Événement:', e);
     
     if (!validateForm()) {
         console.log('Validation échouée');
@@ -114,33 +146,9 @@ async function handleFormSubmit(e) {
         });
         
         console.log('Response status:', response.status);
-        console.log('Response headers:', response.headers);
-        console.log('Response URL:', response.url);
-        
-        // Vérifier si la réponse est du JSON
-        const contentType = response.headers.get('content-type');
-        console.log('Content-Type:', contentType);
         
         if (!response.ok) {
-            // Si le statut n'est pas OK, essayer de lire l'erreur
-            let errorMessage = `Erreur HTTP ${response.status}`;
-            try {
-                const errorText = await response.text();
-                console.log('Response error text:', errorText);
-                if (errorText.startsWith('{')) {
-                    const errorJson = JSON.parse(errorText);
-                    errorMessage = errorJson.error || errorMessage;
-                }
-            } catch (e) {
-                console.log('Impossible de parser l\'erreur:', e);
-            }
-            throw new Error(errorMessage);
-        }
-        
-        if (!contentType || !contentType.includes('application/json')) {
-            const text = await response.text();
-            console.log('Response text (non-JSON):', text);
-            throw new Error('Le serveur a renvoyé une réponse non-JSON. Réponse: ' + text.substring(0, 200));
+            throw new Error(`Erreur HTTP ${response.status}`);
         }
         
         const result = await response.json();
@@ -456,25 +464,40 @@ function closeSellModal() {
 }
 
 // Gestion de l'upload de photos
-let uploadedPhotos = [];
-
 function handlePhotoUpload(event) {
+    console.log('handlePhotoUpload appelée');
+    console.log('Fichiers:', event.target.files);
+    
     const files = Array.from(event.target.files);
     const photoGrid = document.getElementById('photoGrid');
     const slots = photoGrid.querySelectorAll('.photo-slot');
     
+    console.log('Slots trouvés:', slots.length);
+    console.log('uploadedPhotos avant:', uploadedPhotos.length);
+    
     files.forEach((file, index) => {
-        if (uploadedPhotos.length >= 4) return;
+        console.log(`Traitement du fichier ${index}:`, file.name);
+        
+        if (uploadedPhotos.length >= 4) {
+            console.log('Limite de 4 photos atteinte');
+            return;
+        }
         
         const reader = new FileReader();
         reader.onload = function(e) {
+            console.log('FileReader loaded pour:', file.name);
+            
             const slotIndex = uploadedPhotos.length;
             const slot = slots[slotIndex];
+            
+            console.log('Slot index:', slotIndex, 'Slot:', slot);
             
             if (slot) {
                 const img = slot.querySelector('.preview-image');
                 const placeholder = slot.querySelector('.photo-placeholder');
                 const removeBtn = slot.querySelector('.remove-photo');
+                
+                console.log('Éléments trouvés:', {img, placeholder, removeBtn});
                 
                 img.src = e.target.result;
                 img.style.display = 'block';
@@ -487,6 +510,7 @@ function handlePhotoUpload(event) {
                     index: slotIndex
                 });
                 
+                console.log('Photo ajoutée, uploadedPhotos après:', uploadedPhotos.length);
                 updatePhotoRequirements();
             }
         };

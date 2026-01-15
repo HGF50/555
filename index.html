@@ -11,43 +11,38 @@
 <body>
     <!-- Header Mobile -->
     <header class="header">
-        <div class="header-top">
+        <div class="header-content">
             <div class="logo">
-                <i class="fas fa-shopping-bag"></i>
-                <span>Vinted</span>
+                <h1><i class="fas fa-shopping-bag"></i> Vinted Clone</h1>
             </div>
-            <div class="header-actions">
-                <button class="search-btn" onclick="toggleSearch()">
-                    <i class="fas fa-search"></i>
-                </button>
-                <button class="favorite-btn">
-                    <i class="fas fa-heart"></i>
-                </button>
-                <button class="cart-btn">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-count">0</span>
-                </button>
+            
+         
             </div>
         </div>
-        
-        <!-- Barre de recherche cachée -->
-        <div class="search-bar" id="searchBar">
-            <input type="text" placeholder="Rechercher des articles..." id="searchInput">
-            <button onclick="performSearch()">
-                <i class="fas fa-search"></i>
-            </button>
-        </div>
-        
         <!-- Navigation par catégories -->
         <nav class="category-nav">
             <div class="category-scroll">
-                <button class="category-btn active" data-category="all">Tout</button>
-                <button class="category-btn" data-category="women">Femmes</button>
-                <button class="category-btn" data-category="men">Hommes</button>
-                <button class="category-btn" data-category="kids">Enfants</button>
-                <button class="category-btn" data-category="accessories">Accessoires</button>
-                <button class="category-btn" data-category="shoes">Chaussures</button>
-                <button class="category-btn" data-category="bags">Sacs</button>
+                <button class="category-btn active" data-category="all">
+                    <i class="fas fa-th"></i> Tout
+                </button>
+                <button class="category-btn" data-category="women">
+                    <i class="fas fa-female"></i> Femmes
+                </button>
+                <button class="category-btn" data-category="men">
+                    <i class="fas fa-male"></i> Hommes
+                </button>
+                <button class="category-btn" data-category="kids">
+                    <i class="fas fa-child"></i> Enfants
+                </button>
+                <button class="category-btn" data-category="accessories">
+                    <i class="fas fa-glasses"></i> Accessoires
+                </button>
+                <button class="category-btn" data-category="shoes">
+                    <i class="fas fa-shoe-prints"></i> Chaussures
+                </button>
+                <button class="category-btn" data-category="bags">
+                    <i class="fas fa-shopping-bag"></i> Sacs
+                </button>
             </div>
         </nav>
     </header>
@@ -138,7 +133,7 @@
             <span>Catégories</span>
         </button>
         <button class="nav-btn sell-btn" onclick="showSellForm()">
-            <i class="fas fa-plus"></i>
+            <i class="fas fa-plus-circle"></i>
             <span>Vendre</span>
         </button>
         <button class="nav-btn" onclick="showFavorites()">
@@ -146,44 +141,12 @@
             <span>Favoris</span>
         </button>
         <button class="nav-btn" onclick="showProfile()">
-            <i class="fas fa-user"></i>
+            <i class="fas fa-user-circle"></i>
             <span>Profil</span>
         </button>
     </nav>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h4>Vinted</h4>
-                <ul>
-                    <li><a href="#">À propos</a></li>
-                    <li><a href="#">Carrières</a></li>
-                    <li><a href="#">Presse</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Aide</h4>
-                <ul>
-                    <li><a href="#">Centre d'aide</a></li>
-                    <li><a href="#">Contact</a></li>
-                    <li><a href="#">Sécurité</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Légal</h4>
-                <ul>
-                    <li><a href="#">Conditions d'utilisation</a></li>
-                    <li><a href="#">Confidentialité</a></li>
-                    <li><a href="#">Cookies</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 Vinted Clone. Tous droits réservés.</p>
-        </div>
-    </footer>
-
+    
     <!-- Modal Formulaire de Vente -->
     <div class="modal-overlay" id="sellModal">
         <div class="modal-content sell-modal">
@@ -373,6 +336,6 @@
     </div>
 
     <script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
-    <script src="script_simple.js"></script>
+    <script src="script_solution_finale.js"></script>
 </body>
 </html>

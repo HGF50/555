@@ -1,6 +1,3 @@
-// Test au tout début du script
-console.log('🟢 SCRIPT SIMPLE CHARGÉ !');
-
 // Configuration de l'API
 const API_BASE_URL = 'http://localhost:3001/api';
 
@@ -14,17 +11,19 @@ let currentPage = 1;
 let isLoading = false;
 let uploadedPhotos = [];
 
+// Test au tout début du script
+console.log('🟢 SCRIPT SIMPLE CHARGÉ !');
+
 // Fonction pour ouvrir le modal de vente
 function showSellForm() {
     console.log('Bouton Vendre cliqué!');
     const modal = document.getElementById('sellModal');
     if (modal) {
-        modal.style.display = 'flex';
+        modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
-        console.log('Modal affiché avec display:flex');
+        console.log('Modal affiché');
     } else {
         console.error('Modal non trouvé!');
-        alert('Modal non trouvé!');
     }
 }
 
@@ -34,12 +33,12 @@ function closeSellModal() {
     if (modal) {
         modal.style.display = 'none';
         document.body.style.overflow = '';
-        console.log('Modal fermé avec display:none');
+        console.log('Modal fermé');
     }
 }
 
 // Fonction de soumission directe
-async function submitForm() {
+function submitForm() {
     console.log('=== SUBMITFORM APPELÉ ===');
     
     // Vérifier les photos
@@ -89,26 +88,21 @@ async function submitForm() {
     };
     
     console.log('Nouvel article créé:', newProduct);
-    console.log('URL de l\'image principale:', newProduct.image);
-    console.log('URLs des images:', newProduct.images);
-    console.log('Structure uploadedPhotos:', uploadedPhotos);
+    console.log('Photos utilisées:', uploadedPhotos.length);
     
     // Ajouter au début de la liste
     filteredProducts.unshift(newProduct);
     
-    // Sauvegarder dans localStorage pour que les articles persistent
+    // Sauvegarder dans localStorage pour synchronisation
     try {
         localStorage.setItem('vinted_products', JSON.stringify(filteredProducts));
-        console.log('✅ Articles sauvegardés dans localStorage:', filteredProducts.length);
+        console.log('✅ Produits sauvegardés dans localStorage');
     } catch (error) {
-        console.error('❌ Erreur localStorage:', error);
+        console.error('Erreur localStorage:', error);
     }
     
-    // Vider les photos uploadées SEULEMENT après publication réussie
-    // uploadedPhotos = [];
-    // clearPhotoPreviews();  // COMMENTÉ pour ne pas vider les données
-    
-    console.log('📸 Photos conservées pour debug:', uploadedPhotos.length);
+    // Conserver les photos pour qu'elles s'affichent
+    console.log('Photos conservées dans uploadedPhotos:', uploadedPhotos);
     
     alert('Article publié avec succès !');
     closeSellModal();
@@ -116,127 +110,56 @@ async function submitForm() {
     // Recharger l'affichage
     renderProducts();
 }
-function handleFormSubmit(e) {
-    e.preventDefault();
-    console.log('=== FORMULAIRE SOUMIS ===');
-    console.log('Événement:', e);
-    console.log('Formulaire:', e.target);
-    
-    // Afficher les valeurs actuelles du formulaire
-    const formData = new FormData(e.target);
-    console.log('Valeurs du formulaire:');
-    for (let [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
-    }
-    
-    console.log('Photos uploadées:', uploadedPhotos.length);
-    
-    if (!validateForm()) {
-        console.log('La validation a échoué');
-        return;
-    }
-    
-    console.log('Formulaire valide! Affichage du message de succès...');
-    alert('Formulaire soumis avec succès!\n\nPhotos: ' + uploadedPhotos.length + '\nTitre: ' + document.getElementById('title').value);
-    closeSellModal();
-}
 
 // Gestion des photos
 function handlePhotoUpload(event) {
-    console.log('handlePhotoUpload appelée!');
-    console.log('Fichiers sélectionnés:', event.target.files);
-    
-    const files = event.target.files;
+    console.log('📸 Photo uploadée');
+    const files = Array.from(event.target.files);
     const photoGrid = document.getElementById('photoGrid');
-    
-    if (!photoGrid) {
-        console.error('photoGrid non trouvé!');
-        return;
-    }
-    
     const slots = photoGrid.querySelectorAll('.photo-slot');
-    console.log('Slots trouvés:', slots.length);
     
-    for (let i = 0; i < files.length && uploadedPhotos.length < 4; i++) {
-        const file = files[i];
-        console.log('Traitement du fichier:', file.name);
+    files.forEach((file, index) => {
+        if (uploadedPhotos.length >= 4) return;
         
         const reader = new FileReader();
         reader.onload = function(e) {
             const slotIndex = uploadedPhotos.length;
             const slot = slots[slotIndex];
-            
-            console.log('Slot index:', slotIndex, 'Slot:', slot);
-            
             if (slot) {
                 const img = slot.querySelector('.preview-image');
                 const placeholder = slot.querySelector('.photo-placeholder');
                 const removeBtn = slot.querySelector('.remove-photo');
                 
-                console.log('Éléments trouvés:', {img: !!img, placeholder: !!placeholder, removeBtn: !!removeBtn});
+                img.src = e.target.result;
+                img.style.display = 'block';
+                placeholder.style.display = 'none';
+                removeBtn.style.display = 'flex';
                 
-                if (img && placeholder && removeBtn) {
-                    img.src = e.target.result;
-                    img.style.display = 'block';
-                    placeholder.style.display = 'none';
-                    removeBtn.style.display = 'flex';
-                    
-                    // Stocker l'objet photo avec url et file
-                    uploadedPhotos.push({
-                        url: e.target.result,
-                        file: file,
-                        index: uploadedPhotos.length
-                    });
-                    console.log('Photo ajoutée. Total:', uploadedPhotos.length);
-                    console.log('URL stockée:', e.target.result.substring(0, 50) + '...');
-                }
+                uploadedPhotos.push({
+                    file: file,
+                    url: e.target.result,
+                    index: slotIndex
+                });
+                
+                console.log(`Photo ${slotIndex + 1} ajoutée:`, file.name);
+                updatePhotoRequirements();
             }
         };
-        
         reader.readAsDataURL(file);
-    }
+    });
     
-    // Vider l'input
     event.target.value = '';
 }
 
-// Supprimer une photo
 function removePhoto(event, index) {
     event.stopPropagation();
-    console.log('removePhoto appelée pour index:', index);
+    console.log(`🗑️ Suppression photo ${index + 1}`);
     
     const photoGrid = document.getElementById('photoGrid');
     const slots = photoGrid.querySelectorAll('.photo-slot');
-    const slot = slots[index];
     
-    if (slot) {
-        const img = slot.querySelector('.preview-image');
-        const placeholder = slot.querySelector('.photo-placeholder');
-        const removeBtn = slot.querySelector('.remove-photo');
-        
-        if (img && placeholder && removeBtn) {
-            img.src = '';
-            img.style.display = 'none';
-            placeholder.style.display = 'flex';
-            removeBtn.style.display = 'none';
-            
-            // Supprimer de la liste
-            uploadedPhotos.splice(index, 1);
-            console.log('Photo supprimée. Restantes:', uploadedPhotos.length);
-            
-            // Réorganiser les photos restantes
-            reorganizePhotos();
-        }
-    }
-}
-
-// Réorganiser les photos après suppression
-function reorganizePhotos() {
-    const photoGrid = document.getElementById('photoGrid');
-    const slots = photoGrid.querySelectorAll('.photo-slot');
-    
-    // Vider tous les slots
-    slots.forEach((slot, index) => {
+    if (slots[index]) {
+        const slot = slots[index];
         const img = slot.querySelector('.preview-image');
         const placeholder = slot.querySelector('.photo-placeholder');
         const removeBtn = slot.querySelector('.remove-photo');
@@ -245,100 +168,71 @@ function reorganizePhotos() {
         img.style.display = 'none';
         placeholder.style.display = 'flex';
         removeBtn.style.display = 'none';
-    });
+        
+        uploadedPhotos = uploadedPhotos.filter((_, i) => i !== index);
+        
+        // Réorganiser les photos restantes
+        reorganizePhotos();
+    }
+}
+
+function reorganizePhotos() {
+    const photoGrid = document.getElementById('photoGrid');
+    const slots = photoGrid.querySelectorAll('.photo-slot');
     
-    // Remplir avec les photos restantes
-    uploadedPhotos.forEach((photo, index) => {
-        const slot = slots[index];
-        if (slot && index < 4) {
+    uploadedPhotos.forEach((photo, newIndex) => {
+        const slot = slots[newIndex];
+        if (slot) {
             const img = slot.querySelector('.preview-image');
             const placeholder = slot.querySelector('.photo-placeholder');
             const removeBtn = slot.querySelector('.remove-photo');
             
-            // Utiliser photo.url qui contient l'URL base64
             img.src = photo.url;
             img.style.display = 'block';
             placeholder.style.display = 'none';
             removeBtn.style.display = 'flex';
             
-            console.log(`Photo ${index} restaurée:`, photo.url.substring(0, 50) + '...');
+            photo.index = newIndex;
         }
     });
-    
-    console.log('Photos réorganisées:', uploadedPhotos.length);
 }
 
-// Fonctions utilitaires
-function showMessage(text, type = 'info') {
-    console.log('Message:', text, type);
+function updatePhotoRequirements() {
+    const photoCount = document.getElementById('photoCount');
+    const uploadText = document.getElementById('uploadText');
+    
+    if (photoCount) {
+        photoCount.textContent = uploadedPhotos.length;
+    }
+    
+    if (uploadText) {
+        if (uploadedPhotos.length >= 3) {
+            uploadText.textContent = 'Vous pouvez ajouter une photo supplémentaire';
+            uploadText.style.color = '#28a745';
+        } else {
+            uploadText.textContent = `Ajoutez ${3 - uploadedPhotos.length} photo(s) supplémentaire(s)`;
+            uploadText.style.color = '#dc3545';
+        }
+    }
 }
 
-function updateCartCount() {
-    console.log('Panier mis à jour');
-}
-
-function validateForm() {
-    console.log('Validation du formulaire');
+function clearPhotoPreviews() {
+    const photoGrid = document.getElementById('photoGrid');
+    const slots = photoGrid.querySelectorAll('.photo-slot');
     
-    // Vérifier les photos (minimum 3)
-    if (uploadedPhotos.length < 3) {
-        alert('Vous devez ajouter au moins 3 photos pour publier un article.');
-        console.log('Validation échouée: moins de 3 photos');
-        return false;
-    }
-    
-    // Vérifier les champs obligatoires
-    const title = document.getElementById('title').value.trim();
-    const brand = document.getElementById('brand').value.trim();
-    const category = document.getElementById('category').value;
-    const price = document.getElementById('price').value;
-    const condition = document.getElementById('condition').value;
-    
-    if (!title) {
-        alert('Le titre est obligatoire.');
-        console.log('Validation échouée: titre manquant');
-        return false;
-    }
-    
-    if (!brand) {
-        alert('La marque est obligatoire.');
-        console.log('Validation échouée: marque manquante');
-        return false;
-    }
-    
-    if (!category) {
-        alert('La catégorie est obligatoire.');
-        console.log('Validation échouée: catégorie manquante');
-        return false;
-    }
-    
-    if (!price || price <= 0) {
-        alert('Le prix est obligatoire et doit être supérieur à 0.');
-        console.log('Validation échouée: prix invalide');
-        return false;
-    }
-    
-    if (!condition) {
-        alert('L\'état de l\'article est obligatoire.');
-        console.log('Validation échouée: état manquant');
-        return false;
-    }
-    
-    // Vérifier la protection acheteur (déjà cochée par défaut)
-    const acceptProtection = document.getElementById('acceptProtection');
-    if (!acceptProtection || !acceptProtection.checked) {
-        alert('Les frais de protection de 200 FCFA sont obligatoires.');
-        console.log('Validation échouée: frais de protection non acceptés');
-        return false;
-    }
-    
-    console.log('Validation réussie');
-    return true;
+    slots.forEach(slot => {
+        const img = slot.querySelector('.preview-image');
+        const placeholder = slot.querySelector('.photo-placeholder');
+        const removeBtn = slot.querySelector('.remove-photo');
+        
+        if (img) img.src = '';
+        if (img) img.style.display = 'none';
+        if (placeholder) placeholder.style.display = 'flex';
+        if (removeBtn) removeBtn.style.display = 'none';
+    });
 }
 
 function updateTotalPrice() {
-    console.log('Prix total mis à jour');
-    
     const priceInput = document.getElementById('price');
     const price = parseFloat(priceInput.value) || 0;
     
@@ -361,43 +255,6 @@ function updateTotalPrice() {
     console.log(`Prix: ${price} FCFA + Frais: ${protectionFees} FCFA = Total: ${totalPrice} FCFA`);
 }
 
-function updatePhotoRequirements() {
-    console.log('Exigences photos mises à jour');
-}
-
-function clearPhotoPreviews() {
-    console.log('🧹 Nettoyage des aperçus photos (sans vider uploadedPhotos)');
-    
-    // Vider seulement l'affichage des aperçus, PAS les données
-    const photoGrid = document.getElementById('photoGrid');
-    if (photoGrid) {
-        const slots = photoGrid.querySelectorAll('.photo-slot');
-        slots.forEach(slot => {
-            const img = slot.querySelector('.preview-image');
-            const placeholder = slot.querySelector('.photo-placeholder');
-            const removeBtn = slot.querySelector('.remove-photo');
-            
-            if (img) {
-                img.src = '';
-                img.style.display = 'none';
-            }
-            if (placeholder) {
-                placeholder.style.display = 'flex';
-            }
-            if (removeBtn) {
-                removeBtn.style.display = 'none';
-            }
-        });
-    }
-    
-    // NE PAS vider uploadedPhotos ici !
-    // uploadedPhotos = [];  // COMMENTÉ pour garder les données
-}
-
-function setupEventListeners() {
-    console.log('Écouteurs configurés');
-}
-
 // Charger les produits
 async function loadProducts() {
     console.log('🔄 Chargement des produits...');
@@ -412,7 +269,7 @@ async function loadProducts() {
             return;
         }
     } catch (error) {
-        console.error('❌ Erreur localStorage:', error);
+        console.error('Erreur localStorage:', error);
     }
     
     // Si aucun produit dans localStorage, utiliser les données de test
@@ -496,7 +353,7 @@ async function loadProducts() {
         localStorage.setItem('vinted_products', JSON.stringify(filteredProducts));
         console.log('✅ Produits de test sauvegardés dans localStorage');
     } catch (error) {
-        console.error('❌ Erreur sauvegarde localStorage:', error);
+        console.error('Erreur sauvegarde localStorage:', error);
     }
 }
 
@@ -516,19 +373,16 @@ function renderProducts() {
         if (imageSrc && imageSrc.startsWith('data:')) {
             // C'est une image base64, l'utiliser directement
             console.log('✅ Image base64 utilisée pour:', product.title);
-            console.log('Début URL:', imageSrc.substring(0, 50) + '...');
         } else if (!imageSrc) {
             // Image manquante, utiliser une image par défaut
             imageSrc = 'https://picsum.photos/seed/default/300/400';
-            console.log('❌ Image manquante pour:', product.title, '-> utilisation par défaut');
-        } else {
-            console.log('📸 Image URL normale utilisée pour:', product.title);
+            console.log('❌ Image manquante pour:', product.title);
         }
         
         return `
     <div class="product-card" onclick="goToProductDetail('${product._id}')">
         <div class="product-image">
-            <img src="${imageSrc}" alt="${product.title}" loading="lazy" style="width: 100%; height: 300px; object-fit: cover; border-radius: 8px;" onerror="console.error('Erreur chargement image pour:', '${product.title}'); this.src='https://picsum.photos/seed/error/300/400';">
+            <img src="${imageSrc}" alt="${product.title}" loading="lazy" style="width: 100%; height: 300px; object-fit: cover; border-radius: 8px;">
             <button class="favorite-btn-product ${product.liked ? 'active' : ''}" onclick="toggleFavorite(event, '${product._id}')">
                 <i class="fas fa-heart"></i>
             </button>
@@ -548,15 +402,15 @@ function renderProducts() {
         </div>
     </div>
     `;
-}).join('');
+    }).join('');
     
     grid.innerHTML = productsHTML;
+    console.log('✅ Produits affichés:', filteredProducts.length);
 }
 
 // Navigation vers détail produit
 function goToProductDetail(productId) {
     console.log('Navigation vers détail produit, ID:', productId);
-    console.log('URL générée:', `product.html?id=${productId}`);
     window.location.href = `product.html?id=${productId}`;
 }
 
@@ -565,49 +419,24 @@ async function toggleFavorite(event, productId) {
     event.stopPropagation();
     console.log('Toggle favori:', productId);
     
-    try {
-        const response = await fetch(`${API_BASE_URL}/products/${productId}/like`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ userId: 'demo-user' })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-            // Mettre à jour le produit localement
-            const product = filteredProducts.find(p => p._id === productId);
-            if (product) {
-                product.liked = data.liked;
-                product.likes = data.likes;
-            }
-            
-            // Mettre à jour l'affichage
-            renderProducts();
-            
-            // Mettre à jour le bouton
-            const btn = event.target.closest('.favorite-btn-product');
-            if (btn) {
-                if (data.liked) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            }
-            
-            showMessage(data.liked ? 'Ajouté aux favoris' : 'Retiré des favoris', 'success');
+    // Trouver le produit et mettre à jour localement
+    const product = filteredProducts.find(p => p._id === productId);
+    if (product) {
+        product.liked = !product.liked;
+        if (product.liked) {
+            product.likes = (product.likes || 0) + 1;
+            showMessage('Ajouté aux favoris', 'success');
         } else {
-            throw new Error(data.error);
+            product.likes = Math.max(0, (product.likes || 0) - 1);
+            showMessage('Retiré des favoris', 'info');
         }
-    } catch (error) {
-        console.error('Erreur:', error);
-        showMessage('Erreur lors de la mise à jour des favoris', 'error');
+        
+        // Mettre à jour l'affichage
+        renderProducts();
     }
 }
 
-// Autres fonctions
+// Fonctions de navigation
 function showHome() {
     console.log('Accueil');
 }
@@ -657,22 +486,53 @@ function loadMoreProducts() {
     console.log('Charger plus de produits');
 }
 
+// Fonctions utilitaires
+function showMessage(text, type = 'info') {
+    console.log(`Message (${type}): ${text}`);
+    
+    const message = document.createElement('div');
+    message.className = `message ${type}`;
+    message.textContent = text;
+    message.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        background: ${type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#007bff'};
+        color: white;
+        border-radius: 8px;
+        z-index: 10000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+    `;
+    
+    document.body.appendChild(message);
+    
+    setTimeout(() => {
+        message.style.transform = 'translateX(0)';
+    }, 100);
+    
+    setTimeout(() => {
+        message.style.transform = 'translateX(100%)';
+        setTimeout(() => message.remove(), 300);
+    }, 3000);
+}
+
+function updateCartCount() {
+    const cartCount = document.querySelector('.cart-count');
+    if (cartCount) cartCount.textContent = cart.length;
+}
+
 // Initialisation au chargement de la page
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🟢 DOM CHARGÉ - INITIALISATION ===');
     
-    // FORCER le chargement immédiat des produits
-    console.log('🔄 CHARGEMENT IMMÉDIAT DES PRODUITS...');
-    loadProducts();
-    
     // Test immédiat de la grille
     const grid = document.getElementById('productsGrid');
-    console.log('🔍 Grid trouvée:', !!grid);
     if (grid) {
-        grid.innerHTML = '<div style="padding: 20px; background: #e8f5e8; color: #2d6a2d; border-radius: 8px; margin: 10px;">🔄 Chargement des produits...</div>';
-        console.log('✅ Message de chargement ajouté à la grille');
-    } else {
-        console.error('❌ Grid non trouvée!');
+        grid.innerHTML = '<div style="padding: 20px; background: #e8f5e8; color: #2d6a2d; border-radius: 8px; margin: 10px; text-align: center;">✅ Script fonctionne! Grid trouvée!</div>';
+        console.log('✅ Message de test ajouté à la grille');
     }
     
     // Vérifier les éléments essentiels
@@ -686,38 +546,31 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Ajouter l'écouteur au formulaire
     if (sellForm) {
-        sellForm.addEventListener('submit', handleFormSubmit);
+        sellForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            submitForm();
+        });
         console.log('✅ Écouteur de soumission ajouté au formulaire');
-        
-        // Test direct de la soumission
-        console.log('Test du formulaire...');
-        console.log('Méthode du formulaire:', sellForm.method);
-        console.log('Action du formulaire:', sellForm.action);
-        console.log('Champs du formulaire:', sellForm.elements.length);
-        
-    } else {
-        console.error('❌ Formulaire non trouvé!');
     }
     
     // Ajouter un test direct sur le bouton submit
-    const submitBtn = document.querySelector('button[type="button" class="btn-primary" onclick="submitForm()">Publier l\'article</button>');
+    const submitBtn = document.querySelector('button[type="button"].btn-primary');
     if (submitBtn) {
         console.log('✅ Bouton submit trouvé:', submitBtn);
-        submitBtn.addEventListener('click', function(e) {
-            console.log('🔘 Bouton submit cliqué directement!');
-            e.preventDefault();
-            handleFormSubmit(e);
-        });
-    } else {
-        console.error('❌ Bouton submit non trouvé!');
     }
     
     // Initialiser le calcul du prix
     const priceInput = document.getElementById('price');
     if (priceInput) {
         priceInput.addEventListener('input', updateTotalPrice);
-        updateTotalPrice(); // Calcul initial
+        updateTotalPrice();
     }
+    
+    // Charger les données après 2 secondes pour voir le test
+    setTimeout(() => {
+        console.log('🔄 Début du chargement des produits...');
+        loadProducts();
+    }, 2000);
     
     console.log('=== INITIALISATION TERMINÉE ===');
 });

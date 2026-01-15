@@ -149,63 +149,78 @@
             color: #667eea;
         }
 
-        .user-articles {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
+        .tabs-container {
+            margin-top: 20px;
         }
 
-        .user-article-card {
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            overflow: hidden;
-            transition: all 0.3s ease;
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 15px 20px;
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s ease;
+            position: relative;
+            flex: 1;
         }
 
-        .user-article-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        .tab-btn.active {
+            color: #00b894;
         }
 
-        .user-article-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            background: #f5f5f5;
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #00b894;
         }
 
-        .user-article-info {
-            padding: 15px;
-        }
-
-        .user-article-title {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #2c3e50;
-        }
-
-        .user-article-price {
+        .tab-number {
             font-size: 18px;
             font-weight: 700;
-            color: #667eea;
+            line-height: 1;
         }
 
-        .user-article-views {
+        .tab-label {
             font-size: 12px;
-            color: #7f8c8d;
-            margin-top: 5px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .info-item {
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .user-card {
             display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .info-item:last-child {
-            border-bottom: none;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
         }
 
         .info-label {
@@ -294,6 +309,157 @@
             color: white;
         }
 
+        /* Styles pour les notifications */
+        .notifications-container {
+            margin-top: 20px;
+        }
+
+        .notifications-group {
+            margin-bottom: 30px;
+        }
+
+        .notifications-group-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #6c757d;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .notification-count {
+            background: #00b894;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+        }
+
+        .notification-item:hover {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transform: translateX(4px);
+        }
+
+        .notification-item.unread {
+            background: white;
+            border-left-color: #00b894;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .notification-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .notification-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .notification-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notification-content p {
+            margin: 0 0 4px 0;
+            font-size: 14px;
+            color: #2c3e50;
+            line-height: 1.4;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .notification-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .notification-item:nth-child(1) .notification-icon {
+            background: #ff6b6b;
+        }
+
+        .notification-item:nth-child(2) .notification-icon {
+            background: #00b894;
+        }
+
+        .notification-item:nth-child(3) .notification-icon {
+            background: #667eea;
+        }
+
+        .notifications-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .btn-mark-all-read,
+        .btn-notifications-settings {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-mark-all-read {
+            background: #00b894;
+            color: white;
+        }
+
+        .btn-mark-all-read:hover {
+            background: #00a884;
+        }
+
+        .btn-notifications-settings {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #e9ecef;
+        }
+
+        .btn-notifications-settings:hover {
+            background: #e9ecef;
+        }
+
         @media (max-width: 768px) {
             .profile-info {
                 flex-direction: column;
@@ -310,6 +476,29 @@
 
             .user-articles {
                 grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+
+            .notification-item {
+                padding: 12px;
+                gap: 12px;
+            }
+            
+            .notification-avatar {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .notification-content p {
+                font-size: 13px;
+            }
+            
+            .notifications-actions {
+                flex-direction: column;
+            }
+            
+            .btn-mark-all-read,
+            .btn-notifications-settings {
+                justify-content: center;
             }
         }
     </style>
@@ -416,6 +605,345 @@
                         <span class="info-label">Dernière connexion</span>
                         <span class="info-value" id="lastLogin">Aujourd'hui</span>
                     </div>
+                </div>
+            </section>
+
+            <!-- Abonnés et Abonnements -->
+            <section class="profile-section">
+                <h2 class="section-title">
+                    <i class="fas fa-users"></i>
+                    Communauté
+                </h2>
+                
+                <!-- Onglets -->
+                <div class="tabs-container">
+                    <div class="tabs-header">
+                        <button class="tab-btn active" onclick="switchTab('followers')" id="followersTab">
+                            <span class="tab-number">1,234</span>
+                            <span class="tab-label">Abonnés</span>
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('following')" id="followingTab">
+                            <span class="tab-number">567</span>
+                            <span class="tab-label">Abonnements</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Contenu des onglets -->
+                    <div class="tabs-content">
+                        <!-- Onglet Abonnés -->
+                        <div class="tab-content active" id="followersContent">
+                            <div class="users-grid" id="followersGrid">
+                                <!-- Abonnés initiaux -->
+                                <div class="user-card">
+                                    <div class="user-avatar">
+                                        <img src="https://picsum.photos/seed/follower1/80/80" alt="Marie Dupont">
+                                        <div class="user-status online"></div>
+                                    </div>
+                                    <div class="user-info">
+                                        <h4>Marie Dupont</h4>
+                                        <p>@marie_du</p>
+                                        <span class="user-bio">Fashion lover 💕</span>
+                                    </div>
+                                    <button class="btn-follow following">
+                                        <i class="fas fa-check"></i>
+                                        Abonné
+                                    </button>
+                                </div>
+                                
+                                <div class="user-card">
+                                    <div class="user-avatar">
+                                        <img src="https://picsum.photos/seed/follower2/80/80" alt="Pierre Martin">
+                                        <div class="user-status online"></div>
+                                    </div>
+                                    <div class="user-info">
+                                        <h4>Pierre Martin</h4>
+                                        <p>@pierre_ma</p>
+                                        <span class="user-bio">Street style 🛹</span>
+                                    </div>
+                                    <button class="btn-follow following">
+                                        <i class="fas fa-check"></i>
+                                        Abonné
+                                    </button>
+                                </div>
+                                
+                                <div class="user-card">
+                                    <div class="user-avatar">
+                                        <img src="https://picsum.photos/seed/follower3/80/80" alt="Sophie Bernard">
+                                        <div class="user-status offline"></div>
+                                    </div>
+                                    <div class="user-info">
+                                        <h4>Sophie Bernard</h4>
+                                        <p>@sophie_be</p>
+                                        <span class="user-bio">Vintage queen 👑</span>
+                                    </div>
+                                    <button class="btn-follow following">
+                                        <i class="fas fa-check"></i>
+                                        Abonné
+                                    </button>
+                                </div>
+                                
+                                <div class="user-card">
+                                    <div class="user-avatar">
+                                        <img src="https://picsum.photos/seed/follower4/80/80" alt="Lucas Petit">
+                                        <div class="user-status online"></div>
+                                    </div>
+                                    <div class="user-info">
+                                        <h4>Lucas Petit</h4>
+                                        <p>@lucas_pe</p>
+                                        <span class="user-bio">Minimalist 🤍</span>
+                                    </div>
+                                    <button class="btn-follow following">
+                                        <i class="fas fa-check"></i>
+                                        Abonné
+                                    </button>
+                                </div>
+                                
+                                <!-- Abonnés supplémentaires cachés -->
+                                <div class="user-card hidden" data-user="follower5">
+                                    <div class="user-avatar">
+                                        <img src="https://picsum.photos/seed/follower5/80/80" alt="Emma Leroy">
+                                        <div class="user-status online"></div>
+                                    </div>
+                                    <div class="user-info">
+                                        <h4>Emma Leroy</h4>
+                                        <p>@emma_le</p>
+                                        <span class="user-bio">Boho chic 🌿</span>
+                                    </div>
+                                    <button class="btn-follow following">
+                                        <i class="fas fa-check"></i>
+                                        Abonné
+                                    </button>
+                                </div>
+                                
+                                <div class="user-card hidden" data-user="follower6">
+                                    <div class="user-avatar">
+                                        <img src="https://picsum.photos/seed/follower6/80/80" alt="Nicolas Rousseau">
+                                        <div class="user-status offline"></div>
+                                    </div>
+                                    <div class="user-info">
+                                        <h4>Nicolas Rousseau</h4>
+                                        <p>@nicolas_ro</p>
+                                        <span class="user-bio">Casual style 😎</span>
+                                    </div>
+                                    <button class="btn-follow following">
+                                        <i class="fas fa-check"></i>
+                                        Abonné
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <button class="btn-show-more" id="showMoreFollowers" onclick="showMoreUsers('followers')">
+                                <i class="fas fa-chevron-down"></i>
+                                <span>Afficher plus</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Onglet Abonnements -->
+                        <div class="tab-content" id="followingContent">
+                            <div class="users-grid" id="followingGrid">
+                                <!-- Abonnements initiaux -->
+                                <div class="user-card">
+                                    <div class="user-avatar">
+                                        <img src="https://picsum.photos/seed/following1/80/80" alt="Fashion Week">
+                                        <div class="user-status online"></div>
+                                    </div>
+                                    <div class="user-info">
+                                        <h4>Fashion Week</h4>
+                                        <p>@fashion_week</p>
+                                        <span class="user-bio">Latest trends 📸</span>
+                                    </div>
+                                    <button class="btn-follow following">
+                                        <i class="fas fa-check"></i>
+                                        Abonné
+                                    </button>
+                                </div>
+                                
+                                <div class="user-card">
+                                    <div class="user-avatar">
+                                        <img src="https://picsum.photos/seed/following2/80/80" alt="Vintage Store">
+                                        <div class="user-status offline"></div>
+                                    </div>
+                                    <div class="user-info">
+                                        <h4>Vintage Store</h4>
+                                        <p>@vintage_store</p>
+                                        <span class="user-bio">Retro vibes 🕰️</span>
+                                    </div>
+                                    <button class="btn-follow following">
+                                        <i class="fas fa-check"></i>
+                                        Abonné
+                                    </button>
+                                </div>
+                                
+                                <div class="user-card">
+                                    <div class="user-avatar">
+                                        <img src="https://picsum.photos/seed/following3/80/80" alt="Street Style">
+                                        <div class="user-status online"></div>
+                                    </div>
+                                    <div class="user-info">
+                                        <h4>Street Style</h4>
+                                        <p>@street_style</p>
+                                        <span class="user-bio">Urban fashion 🏙️</span>
+                                    </div>
+                                    <button class="btn-follow following">
+                                        <i class="fas fa-check"></i>
+                                        Abonné
+                                    </button>
+                                </div>
+                                
+                                <div class="user-card">
+                                    <div class="user-avatar">
+                                        <img src="https://picsum.photos/seed/following4/80/80" alt="Minimal Chic">
+                                        <div class="user-status offline"></div>
+                                    </div>
+                                    <div class="user-info">
+                                        <h4>Minimal Chic</h4>
+                                        <p>@minimal_chic</p>
+                                        <span class="user-bio">Less is more ⚪</span>
+                                    </div>
+                                    <button class="btn-follow following">
+                                        <i class="fas fa-check"></i>
+                                        Abonné
+                                    </button>
+                                </div>
+                                
+                                <!-- Abonnements supplémentaires cachés -->
+                                <div class="user-card hidden" data-user="following5">
+                                    <div class="user-avatar">
+                                        <img src="https://picsum.photos/seed/following5/80/80" alt="Boho Spirit">
+                                        <div class="user-status online"></div>
+                                    </div>
+                                    <div class="user-info">
+                                        <h4>Boho Spirit</h4>
+                                        <p>@boho_spirit</p>
+                                        <span class="user-bio">Free soul 🌻</span>
+                                    </div>
+                                    <button class="btn-follow following">
+                                        <i class="fas fa-check"></i>
+                                        Abonné
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <button class="btn-show-more" id="showMoreFollowing" onclick="showMoreUsers('following')">
+                                <i class="fas fa-chevron-down"></i>
+                                <span>Afficher plus</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Notifications -->
+            <section class="profile-section">
+                <h2 class="section-title">
+                    <i class="fas fa-bell"></i>
+                    Notifications
+                </h2>
+                
+                <div class="notifications-container">
+                    <!-- Notifications non lues -->
+                    <div class="notifications-group">
+                        <h3 class="notifications-group-title">
+                            <span>Non lues</span>
+                            <span class="notification-count">3</span>
+                        </h3>
+                        
+                        <div class="notification-item unread">
+                            <div class="notification-avatar">
+                                <img src="https://picsum.photos/seed/notif1/50/50" alt="Marie Dupont">
+                            </div>
+                            <div class="notification-content">
+                                <p><strong>Marie Dupont</strong> a aimé votre article "Robe d'été"</p>
+                                <span class="notification-time">Il y a 2 minutes</span>
+                            </div>
+                            <div class="notification-icon">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="notification-item unread">
+                            <div class="notification-avatar">
+                                <img src="https://picsum.photos/seed/notif2/50/50" alt="Pierre Martin">
+                            </div>
+                            <div class="notification-content">
+                                <p><strong>Pierre Martin</strong> a commencé à vous suivre</p>
+                                <span class="notification-time">Il y a 15 minutes</span>
+                            </div>
+                            <div class="notification-icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="notification-item unread">
+                            <div class="notification-avatar">
+                                <img src="https://picsum.photos/seed/notif3/50/50" alt="Sophie Bernard">
+                            </div>
+                            <div class="notification-content">
+                                <p><strong>Sophie Bernard</strong> a commenté votre article</p>
+                                <span class="notification-time">Il y a 1 heure</span>
+                            </div>
+                            <div class="notification-icon">
+                                <i class="fas fa-comment"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Notifications anciennes -->
+                    <div class="notifications-group">
+                        <h3 class="notifications-group-title">
+                            <span>Plus anciennes</span>
+                        </h3>
+                        
+                        <div class="notification-item">
+                            <div class="notification-avatar">
+                                <img src="https://picsum.photos/seed/notif4/50/50" alt="Lucas Petit">
+                            </div>
+                            <div class="notification-content">
+                                <p><strong>Lucas Petit</strong> a acheté votre article "Jean vintage"</p>
+                                <span class="notification-time">Hier</span>
+                            </div>
+                            <div class="notification-icon">
+                                <i class="fas fa-shopping-bag"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="notification-item">
+                            <div class="notification-avatar">
+                                <img src="https://picsum.photos/seed/notif5/50/50" alt="Emma Leroy">
+                            </div>
+                            <div class="notification-content">
+                                <p><strong>Emma Leroy</strong> a évalué votre transaction 5 étoiles</p>
+                                <span class="notification-time">Il y a 2 jours</span>
+                            </div>
+                            <div class="notification-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="notification-item">
+                            <div class="notification-avatar">
+                                <img src="https://picsum.photos/seed/notif6/50/50" alt="Nicolas Rousseau">
+                            </div>
+                            <div class="notification-content">
+                                <p><strong>Nicolas Rousseau</strong> a mis votre article en favori</p>
+                                <span class="notification-time">Il y a 3 jours</span>
+                            </div>
+                            <div class="notification-icon">
+                                <i class="fas fa-bookmark"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="notifications-actions">
+                    <button class="btn-mark-all-read" onclick="markAllAsRead()">
+                        <i class="fas fa-check-double"></i>
+                        Tout marquer comme lu
+                    </button>
+                    <button class="btn-notifications-settings" onclick="openNotificationSettings()">
+                        <i class="fas fa-cog"></i>
+                        Paramètres
+                    </button>
                 </div>
             </section>
 

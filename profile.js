@@ -5,12 +5,317 @@ const API_BASE_URL = 'http://localhost:3001/api';
 let currentUser = null;
 let userArticles = [];
 
+// Fonction pour changer d'onglet
+function switchTab(tabName) {
+    console.log('🔄 Changement d\'onglet vers:', tabName);
+    
+    // Masquer tous les contenus
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Désactiver tous les boutons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Activer l'onglet sélectionné
+    if (tabName === 'followers') {
+        document.getElementById('followersContent').classList.add('active');
+        document.getElementById('followersTab').classList.add('active');
+    } else if (tabName === 'following') {
+        document.getElementById('followingContent').classList.add('active');
+        document.getElementById('followingTab').classList.add('active');
+    }
+}
+
+// Fonction pour afficher plus d'utilisateurs
+function showMoreUsers(type) {
+    const grid = document.getElementById(type + 'Grid');
+    const hiddenUsers = grid.querySelectorAll('.user-card.hidden');
+    const button = document.getElementById('showMore' + type.charAt(0).toUpperCase() + type.slice(1));
+    const buttonText = button.querySelector('span');
+    const buttonIcon = button.querySelector('i');
+    
+    if (hiddenUsers.length > 0) {
+        // Afficher les utilisateurs cachés
+        hiddenUsers.forEach(user => {
+            user.classList.remove('hidden');
+            user.style.display = 'flex';
+            user.style.animation = 'fadeInUp 0.5s ease';
+        });
+        
+        // Mettre à jour le bouton
+        buttonText.textContent = 'Afficher moins';
+        buttonIcon.classList.remove('fa-chevron-down');
+        buttonIcon.classList.add('fa-chevron-up');
+        button.classList.add('expanded');
+        
+        console.log('✅ Utilisateurs supplémentaires affichés pour:', type);
+    } else {
+        // Masquer tous les utilisateurs sauf les 4 premiers
+        const allUsers = grid.querySelectorAll('.user-card');
+        allUsers.forEach((user, index) => {
+            if (index >= 4) {
+                user.classList.add('hidden');
+                user.style.display = 'none';
+            }
+        });
+        
+        // Mettre à jour le bouton
+        buttonText.textContent = 'Afficher plus';
+        buttonIcon.classList.remove('fa-chevron-up');
+        buttonIcon.classList.add('fa-chevron-down');
+        button.classList.remove('expanded');
+        
+        console.log('🔽 Utilisateurs supplémentaires masqués pour:', type);
+    }
+}
+
+// Animation d'apparition
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .user-card {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
+    }
+    
+    .user-card:hover {
+        background: white;
+        border-color: #e9ecef;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+    
+    .user-status {
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 3px solid white;
+    }
+    
+    .user-status.online {
+        background: #00b894;
+    }
+    
+    .user-status.offline {
+        background: #6c757d;
+    }
+    
+    .btn-follow {
+        background: white;
+        border: 1px solid #00b894;
+        color: #00b894;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+    }
+    
+    .btn-follow:hover {
+        background: #00b894;
+        color: white;
+    }
+    
+    .btn-follow.following {
+        background: #00b894;
+        color: white;
+        border-color: #00b894;
+    }
+    
+    .btn-follow.following:hover {
+        background: #00a884;
+        border-color: #00a884;
+    }
+    
+    .user-card.hidden {
+        display: none;
+    }
+    
+    @media (max-width: 768px) {
+        .users-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .tabs-header {
+            gap: 10px;
+        }
+        
+        .tab-btn {
+            padding: 12px 8px;
+            font-size: 11px;
+        }
+        
+        .tab-number {
+            font-size: 16px;
+        }
+        
+        .user-card {
+            padding: 12px;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .btn-follow {
+            padding: 6px 12px;
+            font-size: 11px;
+        }
+    }
+`;
+document.head.appendChild(style);
+
+// Fonctions pour les notifications
+function markAllAsRead() {
+    console.log('🔔 Marquer toutes les notifications comme lues');
+    
+    const unreadNotifications = document.querySelectorAll('.notification-item.unread');
+    unreadNotifications.forEach(notification => {
+        notification.classList.remove('unread');
+    });
+    
+    // Mettre à jour le compteur
+    const notificationCount = document.querySelector('.notification-count');
+    if (notificationCount) {
+        notificationCount.style.display = 'none';
+    }
+    
+    // Afficher un message de confirmation
+    showNotificationMessage('Toutes les notifications ont été marquées comme lues');
+}
+
+function openNotificationSettings() {
+    console.log('⚙️ Ouverture des paramètres de notifications');
+    showNotificationMessage('Paramètres de notifications bientôt disponibles');
+}
+
+function showNotificationMessage(message) {
+    // Créer un message temporaire
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'notification-message';
+    messageDiv.textContent = message;
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #00b894;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        animation: slideInRight 0.3s ease;
+    `;
+    
+    document.body.appendChild(messageDiv);
+    
+    // Supprimer après 3 secondes
+    setTimeout(() => {
+        messageDiv.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => {
+            document.body.removeChild(messageDiv);
+        }, 300);
+    }, 3000);
+}
+
+// Ajouter les animations CSS
+const notificationStyles = document.createElement('style');
+notificationStyles.textContent = `
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(notificationStyles);
+
+// Charger les notifications depuis localStorage
+function loadNotifications() {
+    console.log('🔄 Chargement des notifications...');
+    
+    try {
+        const notifications = JSON.parse(localStorage.getItem('vinted_notifications') || '[]');
+        console.log('✅ Notifications chargées:', notifications.length);
+        
+        // Mettre à jour le compteur
+        const unreadCount = notifications.filter(n => !n.read).length;
+        updateNotificationCount(unreadCount);
+        
+        // Afficher les notifications dans la page profil
+        displayNotifications(notifications);
+        
+    } catch (error) {
+        console.error('❌ Erreur chargement notifications:', error);
+    }
+}
+
+// Afficher les notifications dans le profil
+function displayNotifications(notifications) {
+    const unreadContainer = document.querySelector('.notifications-group:first-child .notification-item');
+    const olderContainer = document.querySelector('.notifications-group:last-child .notification-item');
+    
+    if (!unreadContainer || !olderContainer) return;
+    
+    // Séparer notifications lues et non lues
+    const unread = notifications.filter(n => !n.read).slice(0, 3);
+    const older = notifications.filter(n => n.read).slice(0, 3);
+    
+    // Mettre à jour le compteur
+    const notificationCount = document.querySelector('.notification-count');
+    if (notificationCount) {
+        notificationCount.textContent = unread.length > 0 ? unread.length : '';
+        notificationCount.style.display = unread.length > 0 ? 'inline-block' : 'none';
+    }
+    
+    console.log('📊 Notifications affichées:', unread.length, 'non lues,', older.length, 'anciennes');
+}
+
 // Initialisation au chargement de la page
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🟢 PAGE PROFIL CHARGÉE');
     
     loadUserProfile();
     loadUserArticles();
+    loadNotifications(); // Charger les notifications
     updateCartCount();
 });
 

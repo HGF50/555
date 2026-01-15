@@ -38,88 +38,294 @@ function closeSellModal() {
 }
 
 // Fonction de soumission DIRECTE ET GARANTIE
+// Fonction pour notifier les abonnés
+function notifyFollowers(action, product) {
+    console.log('🔔 Notification des abonnés pour:', action, product);
+    
+    // Récupérer les abonnés depuis localStorage ou utiliser des données de test
+    let followers = [];
+    try {
+        const storedFollowers = localStorage.getItem('vinted_followers');
+        if (storedFollowers) {
+            followers = JSON.parse(storedFollowers);
+        } else {
+            // Abonnés de test
+            followers = [
+                { name: 'Marie Dupont', username: '@marie_du', avatar: 'https://picsum.photos/seed/follower1/50/50' },
+                { name: 'Pierre Martin', username: '@pierre_ma', avatar: 'https://picsum.photos/seed/follower2/50/50' },
+                { name: 'Sophie Bernard', username: '@sophie_be', avatar: 'https://picsum.photos/seed/follower3/50/50' },
+                { name: 'Lucas Petit', username: '@lucas_pe', avatar: 'https://picsum.photos/seed/follower4/50/50' }
+            ];
+            localStorage.setItem('vinted_followers', JSON.stringify(followers));
+        }
+    } catch (error) {
+        console.error('❌ Erreur chargement abonnés:', error);
+        followers = [];
+    }
+    
+    // Créer les notifications pour chaque abonné
+    const notifications = followers.map(follower => {
+        let notificationContent = '';
+        let notificationIcon = '';
+        let notificationTime = 'À l\'instant';
+        
+        if (action === 'new_product') {
+            notificationContent = `<strong>${currentUser?.name || 'Utilisateur Demo'}</strong> a publié un nouvel article "${product.title}"`;
+            notificationIcon = 'fa-shopping-bag';
+        } else if (action === 'product_sold') {
+            notificationContent = `<strong>${currentUser?.name || 'Utilisateur Demo'}</strong> a vendu l'article "${product.title}"`;
+            notificationIcon = 'fa-tag';
+        }
+        
+        return {
+            id: Date.now() + Math.random(),
+            follower: follower,
+            content: notificationContent,
+            icon: notificationIcon,
+            time: notificationTime,
+            read: false,
+            product: product,
+            action: action
+        };
+    });
+    
+    // Sauvegarder les notifications
+    try {
+        const existingNotifications = JSON.parse(localStorage.getItem('vinted_notifications') || '[]');
+        const updatedNotifications = [...notifications, ...existingNotifications];
+        localStorage.setItem('vinted_notifications', JSON.stringify(updatedNotifications));
+        console.log('✅ Notifications sauvegardées pour', followers.length, 'abonnés');
+        
+        // Mettre à jour le compteur de notifications
+        updateNotificationCount(updatedNotifications.filter(n => !n.read).length);
+        
+    } catch (error) {
+        console.error('❌ Erreur sauvegarde notifications:', error);
+    }
+}
+
+// Fonction pour mettre à jour le compteur de notifications
+function updateNotificationCount(count) {
+    try {
+        // Mettre à jour le badge dans le header si existant
+        const notificationBadge = document.querySelector('.notification-badge');
+        if (notificationBadge) {
+            if (count > 0) {
+                notificationBadge.textContent = count > 99 ? '99+' : count;
+                notificationBadge.style.display = 'flex';
+            } else {
+                notificationBadge.style.display = 'none';
+            }
+        }
+        
+        // Mettre à jour le compteur dans la page profil si existant
+        const profileNotificationCount = document.querySelector('.notification-count');
+        if (profileNotificationCount) {
+            if (count > 0) {
+                profileNotificationCount.textContent = count > 99 ? '99+' : count;
+                profileNotificationCount.style.display = 'inline-block';
+            } else {
+                profileNotificationCount.style.display = 'none';
+            }
+        }
+        
+        console.log('🔢 Compteur de notifications mis à jour:', count);
+    } catch (error) {
+        console.error('❌ Erreur mise à jour compteur:', error);
+    }
+}
+
+// Fonction de soumission DIRECTE ET GARANTIE - VERSION DEBUG COMPLÈTE
 function submitForm() {
     console.log('=== SUBMITFORM APPELÉ ===');
+    console.log('📸 Photos uploadées:', uploadedPhotos ? uploadedPhotos.length : 'undefined');
+    console.log('📸 Détail photos:', uploadedPhotos);
     
-    // Vérifier les photos
-    if (uploadedPhotos.length < 3) {
-        alert('Vous devez ajouter au moins 3 photos.');
+    // Test simple pour voir si la fonction s'exécute
+    alert('🧪 TEST: submitForm est bien appelée !');
+    
+    // ÉTAPE 1: Vérification des photos
+    console.log('🔍 ÉTAPE 1: Vérification des photos');
+    if (!uploadedPhotos || uploadedPhotos.length === undefined) {
+        console.log('❌ uploadedPhotos est undefined ou n\'a pas de length');
+        alert('Erreur système: uploadedPhotos non défini');
         return;
     }
     
-    // Vérifier les champs
-    const title = document.getElementById('title').value;
-    const brand = document.getElementById('brand').value;
-    const category = document.getElementById('category').value;
-    const price = parseFloat(document.getElementById('price').value);
-    const condition = document.getElementById('condition').value;
+    if (uploadedPhotos.length < 3) {
+        console.log('❌ Photos insuffisantes:', uploadedPhotos.length, '/ 3 requis');
+        alert('Vous devez ajouter au moins 3 photos. Actuellement: ' + uploadedPhotos.length);
+        return;
+    }
+    console.log('✅ Photos OK:', uploadedPhotos.length);
     
+    // ÉTAPE 2: Récupération des champs
+    console.log('🔍 ÉTAPE 2: Récupération des champs');
+    const titleElement = document.getElementById('title');
+    const brandElement = document.getElementById('brand');
+    const categoryElement = document.getElementById('category');
+    const priceElement = document.getElementById('price');
+    const conditionElement = document.getElementById('condition');
+    
+    console.log('Éléments trouvés:', {
+        title: !!titleElement,
+        brand: !!brandElement,
+        category: !!categoryElement,
+        price: !!priceElement,
+        condition: !!conditionElement
+    });
+    
+    if (!titleElement || !brandElement || !categoryElement || !priceElement || !conditionElement) {
+        console.log('❌ Un ou plusieurs éléments non trouvés');
+        alert('Erreur système: champs du formulaire non trouvés');
+        return;
+    }
+    
+    const title = titleElement.value;
+    const brand = brandElement.value;
+    const category = categoryElement.value;
+    const price = parseFloat(priceElement.value);
+    const condition = conditionElement.value;
+    
+    console.log('Valeurs des champs:', {title, brand, category, price, condition});
+    
+    // ÉTAPE 3: Validation des champs
+    console.log('🔍 ÉTAPE 3: Validation des champs');
     if (!title || !brand || !category || !price || !condition) {
+        console.log('❌ Champs obligatoires manquants');
         alert('Veuillez remplir tous les champs obligatoires.');
         return;
     }
+    console.log('✅ Champs OK');
     
-    // Créer le produit avec GARANTIE de conservation
-    const newProduct = {
-        _id: String(Date.now()), // ID unique basé sur timestamp
-        title: title,
-        brand: brand,
-        price: price,
-        originalPrice: null,
-        size: "M",
-        condition: condition,
-        category: category,
-        description: "Article publié depuis Vinted Clone",
-        seller: {
-            name: "Utilisateur Demo",
-            rating: 4.5,
-            avatar: "https://picsum.photos/seed/seller/50/50"
-        },
-        // GARANTIR la conservation des images
-        images: uploadedPhotos.map(photo => photo.url || photo),
-        image: uploadedPhotos.length > 0 ? (uploadedPhotos[0].url || uploadedPhotos[0]) : 'https://picsum.photos/seed/new/300/400',
-        protectionFees: 200,
-        totalPrice: price + 200,
-        views: 0,
-        likes: 0,
-        liked: false,
-        createdAt: new Date(),
-        updatedAt: new Date()
-    };
+    // ÉTAPE 4: Validation de la catégorie
+    console.log('🔍 ÉTAPE 4: Validation de la catégorie');
+    const categoriesAutorisees = ['women', 'men', 'kids', 'accessories', 'shoes', 'bags'];
+    if (!categoriesAutorisees.includes(category)) {
+        console.log('❌ Catégorie non autorisée:', category);
+        alert('Catégorie non autorisée: ' + category);
+        return;
+    }
+    console.log('✅ Catégorie OK:', category);
     
-    console.log('Nouvel article créé:', newProduct);
-    console.log('Images conservées:', newProduct.images.length);
+    // ÉTAPE 4.5: Validation des mots interdits
+    console.log('🔍 ÉTAPE 4.5: Validation des mots interdits');
+    const titreMinuscule = title.toLowerCase();
+    const motsInterdits = ['téléphone', 'telephone', 'iphone', 'samsung', 'xiaomi', 'huawei', 'oppo', 'oneplus', 'nokia', 'sony', 'lg', 'htc', 'motorola', 'blackberry', 'portable', 'mobile', 'smartphone', 'appareil photo', 'ordinateur', 'pc', 'mac', 'laptop', 'tablet', 'ipad', 'console', 'playstation', 'xbox', 'nintendo', 'jeu vidéo', 'livre', 'meuble', 'décoration', 'jardin', 'outils', 'voiture', 'moto', 'vélo', 'épicerie', 'nourriture', 'animal', 'plante', 'médicament', 'produit chimique', 'électronique', 'electronique'];
     
-    // DOUBLE SAUVEGARDE POUR GARANTIE
-    filteredProducts.unshift(newProduct);
+    console.log('Recherche mots interdits dans:', titreMinuscule);
+    for (const mot of motsInterdits) {
+        if (titreMinuscule.includes(mot)) {
+            console.log('❌ Mot interdit trouvé:', mot);
+            alert(`❌ ARTICLE INTERDIT !\n\nLe mot "${mot}" n\'est pas autorisé.\n\nSEULS LES ARTICLES DE MODE SONT ACCEPTÉS :\n• Vêtements (t-shirts, robes, jeans, pulls...)\n• Chaussures (baskets, bottes, talons...)\n• Sacs (sacs à main, sacs à dos, pochettes...)\n• Accessoires (bijoux, montres, lunettes...)\n• Maroquinerie (portefeuilles, ceintures...)\n\nLes produits non-mode sont strictement interdits.`);
+            return;
+        }
+    }
+    console.log('✅ Aucun mot interdit trouvé');
     
-    // 1. SessionStorage (immédiat)
+    // ÉTAPE 5: Validation du titre (mode)
+    console.log('🔍 ÉTAPE 5: Validation du titre (mode)');
+    const motsMode = ['t-shirt', 'tshirt', 'tee shirt', 'top', 'chemise', 'pull', 'sweat', 'robe', 'jupe', 'pantalon', 'jean', 'short', 'manteau', 'veste', 'blouson', 'gilet', 'débardeur', 'body', 'combinaison', 'pyjama', 'maillot', 'sous-vêtement', 'lingerie', 'chaussures', 'baskets', 'bottes', 'talons', 'sandales', 'mocassins', 'sac', 'sac à main', 'sac à dos', 'pochette', 'bijoux', 'bague', 'collier', 'bracelet', 'boucle d\'oreille', 'montre', 'lunettes', 'ceinture', 'portefeuille', 'foulard', 'écharpe', 'chapeau', 'bonnet', 'casquette', 'gants'];
+    
+    console.log('Recherche de mot de mode dans:', titreMinuscule);
+    const contientMotMode = motsMode.some(mot => titreMinuscule.includes(mot));
+    console.log('Mots de mode trouvés:', motsMode.filter(mot => titreMinuscule.includes(mot)));
+    
+    if (!contientMotMode) {
+        console.log('❌ Aucun mot de mode trouvé');
+        alert('Votre titre doit décrire un article de mode (t-shirt, robe, jean, etc.)');
+        return;
+    }
+    console.log('✅ Titre OK - mot de mode trouvé');
+    
+    // ÉTAPE 6: Création du produit
+    console.log('🔍 ÉTAPE 6: Création du produit');
     try {
+        const maxId = Math.max(...filteredProducts.map(p => parseInt(p._id) || 0), 0);
+        const newId = String(maxId + 1);
+        
+        const newProduct = {
+            _id: newId,
+            title: title,
+            brand: brand,
+            price: price,
+            originalPrice: null,
+            size: "M",
+            condition: condition,
+            category: category,
+            description: "Article publié depuis Vinted Clone",
+            seller: {
+                name: "Utilisateur Demo",
+                rating: 4.5,
+                avatar: "https://picsum.photos/seed/seller/50/50"
+            },
+            images: uploadedPhotos.map(photo => photo.url || photo),
+            image: uploadedPhotos.length > 0 ? (uploadedPhotos[0].url || uploadedPhotos[0]) : 'https://picsum.photos/seed/new/300/400',
+            protectionFees: 200,
+            totalPrice: price + 200,
+            views: 0,
+            likes: 0,
+            liked: false,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+        
+        console.log('✅ Produit créé:', newProduct);
+        
+        // ÉTAPE 7: Sauvegarde
+        console.log('🔍 ÉTAPE 7: Sauvegarde');
+        filteredProducts.unshift(newProduct);
+        
         sessionStorage.setItem('vinted_products_temp', JSON.stringify(filteredProducts));
-        console.log('✅ SessionStorage mis à jour');
+        localStorage.setItem('vinted_products', JSON.stringify(filteredProducts));
+        console.log('✅ Sauvegarde OK');
+        
+        // ÉTAPE 8: Finalisation
+        console.log('🔍 ÉTAPE 8: Finalisation');
+        alert('Article publié avec succès !');
+        closeSellModal();
+        renderProducts();
+        clearPhotoPreviews();
+        uploadedPhotos = [];
+        
+        console.log('=== ARTICLE PUBLIÉ AVEC SUCCÈS ===');
+        
     } catch (error) {
-        console.error('❌ Erreur SessionStorage:', error);
+        console.error('❌ Erreur lors de la création du produit:', error);
+        alert('Erreur lors de la publication: ' + error.message);
+    }
+}
+
+// Fonction pour vendre un produit
+function sellProduct(productId) {
+    console.log('🛍️ Vente du produit:', productId);
+    
+    // Trouver le produit
+    const product = filteredProducts.find(p => p._id === productId);
+    if (!product) {
+        console.error('❌ Produit non trouvé:', productId);
+        return;
     }
     
-    // 2. LocalStorage (persistant)
+    // NOTIFIER LES ABONNÉS - PRODUIT VENDU
+    notifyFollowers('product_sold', product);
+    
+    // Marquer comme vendu
+    product.sold = true;
+    product.soldDate = new Date();
+    
+    // Sauvegarder
     try {
         localStorage.setItem('vinted_products', JSON.stringify(filteredProducts));
-        console.log('✅ LocalStorage mis à jour');
+        sessionStorage.setItem('vinted_products_temp', JSON.stringify(filteredProducts));
+        console.log('✅ Produit marqué comme vendu');
+        
+        alert('Produit vendu avec succès !');
+        renderProducts();
+        
     } catch (error) {
-        console.error('❌ Erreur LocalStorage:', error);
+        console.error('❌ Erreur sauvegarde vente:', error);
     }
-    
-    alert('Article publié avec succès !');
-    closeSellModal();
-    
-    // Recharger l'affichage IMMÉDIATEMENT
-    renderProducts();
-    
-    // Vider les photos uploadées SEULEMENT de l'interface
-    clearPhotoPreviews();
-    uploadedPhotos = [];
-    
-    console.log('=== ARTICLE PUBLIÉ ET GARANTI ===');
 }
 
 // Gestion des photos AMÉLIORÉE
@@ -341,13 +547,57 @@ async function loadProducts() {
             },
             {
                 _id: '3',
-                title: "Sac à main en cuir",
+                title: "Veste en cuir synthétique",
                 brand: "Mango",
-                price: 45.00,
+                price: 45.99,
                 originalPrice: 89.99,
-                size: "Unique",
+                size: "M",
+                condition: "Très bon état",
+                category: "women",
+                image: "https://picsum.photos/seed/veste1/300/400",
+                seller: {
+                    name: "Sophie",
+                    rating: 4.7,
+                    avatar: "https://picsum.photos/seed/sophie/50/50"
+                },
+                likes: 32,
+                liked: false,
+                description: "Élégante veste en cuir synthétique, idéale pour l'automne.",
+                status: 'available',
+                createdAt: new Date(),
+                updatedAt: new Date()
+            },
+            {
+                _id: '4',
+                title: "Basket blanche mode",
+                brand: "Nike",
+                price: 65.99,
+                originalPrice: null,
+                size: "42",
                 condition: "Neuf",
-                category: "accessories",
+                category: "men",
+                image: "https://picsum.photos/seed/basket1/300/400",
+                seller: {
+                    name: "Lucas",
+                    rating: 4.6,
+                    avatar: "https://picsum.photos/seed/lucas/50/50"
+                },
+                likes: 45,
+                liked: false,
+                description: "Basket blanche tendance, confortable et stylée.",
+                status: 'available',
+                createdAt: new Date(),
+                updatedAt: new Date()
+            },
+            {
+                _id: '5',
+                title: "Sac à main en cuir véritable",
+                brand: "Chanel",
+                price: 120.99,
+                originalPrice: 250.99,
+                size: null,
+                condition: "Neuf",
+                category: "women",
                 image: "https://picsum.photos/seed/sac1/300/400",
                 seller: {
                     name: "Sophie",
@@ -413,7 +663,7 @@ function renderProducts() {
         return `
     <div class="product-card" onclick="goToProductDetail('${product._id}')">
         <div class="product-image">
-            <img src="${imageSrc}" alt="${product.title}" loading="lazy" style="width: 100%; height: 300px; object-fit: cover; border-radius: 8px;" onerror="console.error('Erreur chargement image pour:', '${product.title}'); this.src='https://picsum.photos/seed/error/300/400';">
+            <img src="${imageSrc}" alt="${product.title}" loading="lazy" onerror="console.error('Erreur chargement image pour:', '${product.title}'); this.src='https://picsum.photos/seed/error/300/400';">
             <button class="favorite-btn-product ${product.liked ? 'active' : ''}" onclick="toggleFavorite(event, '${product._id}')">
                 <i class="fas fa-heart"></i>
             </button>
@@ -449,19 +699,34 @@ function renderProducts() {
 
 // Navigation vers détail produit
 function goToProductDetail(productId) {
-    console.log('Navigation vers détail produit, ID:', productId);
-    console.log('URL générée:', `product.html?id=${productId}`);
+    console.log('🎯 Navigation vers détail produit');
+    console.log('📋 ID reçu:', productId);
+    console.log('📦 Produits disponibles:', filteredProducts.map(p => ({id: p._id, title: p.title})));
     
-    // Sauvegarder avant navigation
-    try {
-        localStorage.setItem('vinted_products', JSON.stringify(filteredProducts));
-        sessionStorage.setItem('vinted_products_temp', JSON.stringify(filteredProducts));
-        console.log('✅ Sauvegarde avant navigation');
-    } catch (error) {
-        console.error('❌ Erreur sauvegarde navigation:', error);
+    // Trouver le produit pour vérification
+    const product = filteredProducts.find(p => p._id === productId);
+    if (product) {
+        console.log('✅ Produit trouvé:', product.title);
+        console.log('🌐 URL générée:', `product.html?id=${productId}`);
+        
+        // Sauvegarder avant navigation
+        try {
+            localStorage.setItem('vinted_products', JSON.stringify(filteredProducts));
+            sessionStorage.setItem('vinted_products_temp', JSON.stringify(filteredProducts));
+            sessionStorage.setItem('current_product_id', productId);
+            console.log('✅ Sauvegarde avant navigation');
+        } catch (error) {
+            console.error('❌ Erreur sauvegarde navigation:', error);
+        }
+        
+        // Navigation avec délai pour voir les logs
+        setTimeout(() => {
+            window.location.href = `product.html?id=${productId}`;
+        }, 100);
+    } else {
+        console.error('❌ Produit non trouvé avec ID:', productId);
+        alert('Produit non trouvé');
     }
-    
-    window.location.href = `product.html?id=${productId}`;
 }
 
 // Toggle favori
@@ -527,7 +792,39 @@ function toggleFilters() {
 }
 
 function performSearch() {
-    console.log('Recherche effectuée');
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+    console.log('🔍 Recherche effectuée:', searchTerm);
+    
+    if (searchTerm === '') {
+        // Si la recherche est vide, afficher tous les produits
+        renderProducts();
+        return;
+    }
+    
+    // Filtrer les produits selon le terme de recherche
+    const filtered = filteredProducts.filter(product => {
+        return product.title.toLowerCase().includes(searchTerm) ||
+               product.brand.toLowerCase().includes(searchTerm) ||
+               product.category.toLowerCase().includes(searchTerm) ||
+               product.description.toLowerCase().includes(searchTerm);
+    });
+    
+    console.log('📊 Résultats trouvés:', filtered.length);
+    
+    // Afficher les résultats
+    renderProducts(filtered);
+    
+    // Afficher un message si aucun résultat
+    if (filtered.length === 0) {
+        const productsGrid = document.getElementById('productsGrid');
+        productsGrid.innerHTML = `
+            <div class="no-results">
+                <i class="fas fa-search"></i>
+                <h3>Aucun résultat trouvé</h3>
+                <p>Essayez avec d'autres mots-clés</p>
+            </div>
+        `;
+    }
 }
 
 function filterAndSortProducts() {

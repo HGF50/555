@@ -14,18 +14,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('id');
     
-    console.log('ID du produit depuis URL:', productId);
+    console.log('🔍 ID du produit depuis URL:', productId);
     
-    // Test avec un ID fixe si aucun ID trouvé ou si ID trop grand
+    // Utiliser l'ID directement sans modification
     let finalProductId = productId;
     
-    if (!productId || parseInt(productId) > 100) {
+    if (!productId) {
         finalProductId = '1';
-        console.log('ID invalide ou trop grand, utilisation de l\'ID 1 par défaut');
-        showMessage('ID invalide, affichage de l\'article 1', 'info');
+        console.log('❌ ID non trouvé, utilisation de l\'ID 1 par défaut');
+        showMessage('ID non trouvé, affichage de l\'article 1', 'info');
     }
     
-    console.log('ID final utilisé:', finalProductId);
+    console.log('🎯 ID final utilisé:', finalProductId);
     
     loadProductDetail(finalProductId);
     
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Charger les détails du produit
 async function loadProductDetail(productId) {
-    console.log('Chargement du produit:', productId);
+    console.log('🔍 Chargement du produit:', productId);
     
     // D'abord essayer de trouver dans les produits locaux
     let products = [];
@@ -44,13 +44,26 @@ async function loadProductDetail(productId) {
         const storedProducts = localStorage.getItem('vinted_products');
         if (storedProducts) {
             products = JSON.parse(storedProducts);
-            console.log('Produits récupérés depuis localStorage:', products.length);
+            console.log('✅ Produits récupérés depuis localStorage:', products.length);
         }
     } catch (error) {
-        console.error('Erreur localStorage:', error);
+        console.error('❌ Erreur localStorage:', error);
     }
     
-    // Si aucun produit dans localStorage, utiliser les données de test
+    // Si aucun produit dans localStorage, essayer sessionStorage
+    if (products.length === 0) {
+        try {
+            const sessionProducts = sessionStorage.getItem('vinted_products_temp');
+            if (sessionProducts) {
+                products = JSON.parse(sessionProducts);
+                console.log('✅ Produits récupérés depuis sessionStorage:', products.length);
+            }
+        } catch (error) {
+            console.error('❌ Erreur sessionStorage:', error);
+        }
+    }
+    
+    // Si toujours aucun produit, utiliser les données de test cohérentes
     if (products.length === 0) {
         products = [
             {
@@ -75,41 +88,65 @@ async function loadProductDetail(productId) {
                 status: 'available',
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                views: 156
-            },
-            {
-                _id: '2',
-                title: "Jean slim fit noir",
-                brand: "H&M",
-                price: 19.99,
-                originalPrice: 39.99,
-                size: "L",
-                condition: "Comme neuf",
-                category: "men",
-                image: "https://picsum.photos/seed/jean1/300/400",
-                images: ["https://picsum.photos/seed/jean1/300/400", "https://picsum.photos/seed/jean2/300/400"],
-                seller: {
-                    name: "Pierre",
-                    rating: 4.9,
-                    avatar: "https://picsum.photos/seed/pierre/50/50"
-                },
-                likes: 18,
-                liked: false,
-                description: "Jean slim fit noir, parfait pour toutes occasions. Coupe moderne et élégante, s'adapte à tous les styles.",
-                status: 'available',
-                createdAt: new Date(),
-                updatedAt: new Date(),
                 views: 89
             },
             {
                 _id: '3',
-                title: "Sac à main en cuir",
+                title: "Veste en cuir synthétique",
                 brand: "Mango",
-                price: 45.00,
+                price: 45.99,
                 originalPrice: 89.99,
-                size: "Unique",
+                size: "M",
+                condition: "Très bon état",
+                category: "women",
+                image: "https://picsum.photos/seed/veste1/300/400",
+                images: ["https://picsum.photos/seed/veste1/300/400", "https://picsum.photos/seed/veste2/300/400"],
+                seller: {
+                    name: "Sophie",
+                    rating: 4.7,
+                    avatar: "https://picsum.photos/seed/sophie/50/50"
+                },
+                likes: 32,
+                liked: false,
+                description: "Élégante veste en cuir synthétique, idéale pour l'automne. Style moderne et confortable.",
+                status: 'available',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                views: 234
+            },
+            {
+                _id: '4',
+                title: "Basket blanche mode",
+                brand: "Nike",
+                price: 65.99,
+                originalPrice: null,
+                size: "42",
                 condition: "Neuf",
-                category: "accessories",
+                category: "men",
+                image: "https://picsum.photos/seed/basket1/300/400",
+                images: ["https://picsum.photos/seed/basket1/300/400", "https://picsum.photos/seed/basket2/300/400"],
+                seller: {
+                    name: "Lucas",
+                    rating: 4.6,
+                    avatar: "https://picsum.photos/seed/lucas/50/50"
+                },
+                likes: 45,
+                liked: false,
+                description: "Basket blanche tendance, confortable et stylée. Parfait pour le sport et le quotidien.",
+                status: 'available',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                views: 312
+            },
+            {
+                _id: '5',
+                title: "Sac à main en cuir véritable",
+                brand: "Chanel",
+                price: 120.99,
+                originalPrice: 250.99,
+                size: null,
+                condition: "Neuf",
+                category: "women",
                 image: "https://picsum.photos/seed/sac1/300/400",
                 images: ["https://picsum.photos/seed/sac1/300/400", "https://picsum.photos/seed/sac2/300/400"],
                 seller: {
@@ -119,26 +156,37 @@ async function loadProductDetail(productId) {
                 },
                 likes: 32,
                 liked: false,
-                description: "Magnifique sac à main en cuir véritable, jamais utilisé. Idéal pour le quotidien ou les occasions spéciales.",
+                description: "Magnifique sac à main en cuir véritable, jamais utilisé. Élégant et intemporel.",
                 status: 'available',
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                views: 234
+                views: 445
             }
         ];
-        console.log('Utilisation des données de test par défaut');
+        console.log('📦 Utilisation des données de test par défaut');
     }
+    
+    console.log('🔍 Recherche du produit avec ID:', productId);
+    console.log('📋 Produits disponibles:', products.map(p => ({id: p._id, title: p.title})));
     
     const product = products.find(p => p._id === productId);
     
     if (product) {
-        console.log('✅ Produit trouvé:', product);
+        console.log('✅ Produit trouvé:', product.title);
         currentProduct = product;
         currentImageIndex = 0;
         displayProductDetails(product);
     } else {
-        console.log('❌ Produit non trouvé, ID:', productId);
+        console.error('❌ Produit non trouvé avec ID:', productId);
         showMessage('Produit non trouvé', 'error');
+        
+        // Afficher le premier produit par défaut
+        if (products.length > 0) {
+            console.log('🔄 Affichage du premier produit par défaut');
+            currentProduct = products[0];
+            currentImageIndex = 0;
+            displayProductDetails(products[0]);
+        }
     }
 }
 

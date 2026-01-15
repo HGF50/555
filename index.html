@@ -47,6 +47,19 @@
         </nav>
     </header>
 
+    <!-- Barre de recherche -->
+    <div class="search-section">
+        <div class="search-container">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Rechercher des articles..." onkeyup="performSearch()">
+                <button class="search-btn" onclick="performSearch()">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Filtres -->
     <div class="filter-section">
         <button class="filter-btn" onclick="toggleFilters()">
@@ -230,13 +243,13 @@
                         <div class="form-group">
                             <label for="category">Catégorie *</label>
                             <select id="category" name="category" required>
-                                <option value="">Sélectionne une catégorie</option>
-                                <option value="women">Femmes</option>
-                                <option value="men">Hommes</option>
-                                <option value="kids">Enfants</option>
-                                <option value="accessories">Accessoires</option>
+                                <option value="">Sélectionner une catégorie</option>
+                                <option value="women">Vêtements femme</option>
+                                <option value="men">Vêtements homme</option>
+                                <option value="kids">Vêtements enfant</option>
+                                <option value="accessories">Accessoires de mode</option>
                                 <option value="shoes">Chaussures</option>
-                                <option value="bags">Sacs</option>
+                                <option value="bags">Sacs et maroquinerie</option>
                             </select>
                         </div>
 

@@ -583,28 +583,586 @@ body {
     color: #6c757d;
 }
 
-/* Responsive */
-@media (min-width: 768px) {
+/* Responsive - MOBILE FIRST */
+@media (max-width: 767px) {
+    /* Optimisations touch mobile */
+    * {
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    
+    input, textarea, select {
+        -webkit-user-select: auto;
+        user-select: auto;
+    }
+    
+    /* Header Mobile */
+    .header-top {
+        padding: 8px 12px;
+        height: 50px;
+    }
+    
+    .logo {
+        font-size: 18px;
+    }
+    
+    .header-actions {
+        gap: 12px;
+    }
+    
+    .header-actions button {
+        padding: 8px;
+        font-size: 14px;
+        min-height: 40px;
+        min-width: 40px;
+        touch-action: manipulation;
+    }
+    
+    /* Barre de recherche mobile */
+    .search-container {
+        padding: 8px 12px;
+    }
+    
+    .search-input {
+        height: 44px;
+        font-size: 16px;
+        padding: 0 16px;
+        border-radius: 22px;
+        touch-action: manipulation;
+    }
+    
+    .search-btn {
+        height: 44px;
+        width: 44px;
+        font-size: 14px;
+        border-radius: 22px;
+        touch-action: manipulation;
+    }
+    
+    /* Navigation catégories mobile */
+    .categories-nav {
+        padding: 8px 12px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        scroll-behavior: smooth;
+    }
+    
+    .categories-nav::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .category-btn {
+        min-width: auto;
+        padding: 10px 16px;
+        font-size: 14px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        touch-action: manipulation;
+        border-radius: 20px;
+        transition: all 0.2s ease;
+    }
+    
+    .category-btn:active {
+        transform: scale(0.95);
+    }
+    
+    /* Section filtres mobile */
+    .filter-section {
+        padding: 12px;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .filter-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px;
+        font-size: 14px;
+        height: 48px;
+        border-radius: 24px;
+        touch-action: manipulation;
+        transition: all 0.2s ease;
+    }
+    
+    .filter-btn:active {
+        transform: scale(0.95);
+    }
+    
+    .sort-options {
+        width: 100%;
+    }
+    
+    #sortSelect {
+        width: 100%;
+        height: 48px;
+        font-size: 16px;
+        padding: 0 16px;
+        border-radius: 12px;
+        touch-action: manipulation;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 12px center;
+        background-repeat: no-repeat;
+        background-size: 20px;
+        padding-right: 44px;
+    }
+    
+    /* Grille produits mobile */
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        padding: 12px;
+    }
+    
+    .main-content {
+        padding: 12px;
+        padding-bottom: 80px;
+    }
+    
+    /* Cartes produits mobile */
+    .product-card {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.2s ease;
+        touch-action: manipulation;
+    }
+    
+    .product-card:active {
+        transform: scale(0.98);
+    }
+    
+    .product-image {
+        height: 200px;
+        position: relative;
+    }
+    
+    .product-info {
+        padding: 12px;
+    }
+    
+    .product-title {
+        font-size: 14px;
+        line-height: 1.3;
+        margin-bottom: 4px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .product-brand {
+        font-size: 12px;
+        margin-bottom: 6px;
+        color: #6c757d;
+    }
+    
+    .product-price {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 4px;
+        color: #212529;
+    }
+    
+    .product-size {
+        font-size: 12px;
+        margin-bottom: 8px;
+        color: #6c757d;
+    }
+    
+    .product-seller {
+        font-size: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        color: #6c757d;
+    }
+    
+    .seller-avatar {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+    }
+    
+    .favorite-btn-product {
+        width: 40px;
+        height: 40px;
+        top: 8px;
+        right: 8px;
+        font-size: 14px;
+        border-radius: 20px;
+        touch-action: manipulation;
+        transition: all 0.2s ease;
+    }
+    
+    .favorite-btn-product:active {
+        transform: scale(0.9);
+    }
+    
+    /* Panneau filtres mobile */
+    .filter-panel {
+        width: 100%;
+        right: -100%;
+        border-radius: 0;
+        max-height: 100vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .filter-panel.active {
+        right: 0;
+    }
+    
+    .filter-header {
+        padding: 16px;
+        border-bottom: 1px solid #e9ecef;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .filter-header h3 {
+        font-size: 18px;
+        font-weight: 600;
+    }
+    
+    .close-filters {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+        border-radius: 20px;
+        touch-action: manipulation;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .close-filters:active {
+        transform: scale(0.9);
+    }
+    
+    .filter-content {
+        padding: 16px;
+        max-height: calc(100vh - 80px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .filter-group {
+        margin-bottom: 24px;
+    }
+    
+    .filter-group h4 {
+        font-size: 16px;
+        margin-bottom: 12px;
+        font-weight: 600;
+    }
+    
+    /* Modal vente mobile */
+    .modal-content {
+        width: 100%;
+        height: 100vh;
+        border-radius: 0;
+        margin: 0;
+        max-width: none;
+        max-height: none;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .modal-header {
+        padding: 16px;
+        border-bottom: 1px solid #e9ecef;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+    }
+    
+    .modal-header h2 {
+        font-size: 18px;
+        font-weight: 600;
+    }
+    
+    .close-modal {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+        border-radius: 20px;
+        touch-action: manipulation;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .close-modal:active {
+        transform: scale(0.9);
+    }
+    
+    .modal-body {
+        padding: 16px;
+        max-height: none;
+        overflow-y: visible;
+    }
+    
+    /* Formulaire mobile */
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        font-size: 14px;
+        margin-bottom: 8px;
+        font-weight: 500;
+        display: block;
+    }
+    
+    .form-control {
+        height: 48px;
+        font-size: 16px;
+        padding: 0 16px;
+        border-radius: 12px;
+        border: 2px solid #e9ecef;
+        transition: all 0.2s ease;
+        touch-action: manipulation;
+    }
+    
+    .form-control:focus {
+        border-color: #00b894;
+        box-shadow: 0 0 0 3px rgba(0, 184, 148, 0.1);
+        outline: none;
+    }
+    
+    /* Upload photos mobile */
+    .photo-upload {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    .photo-slot {
+        height: 140px;
+        border-radius: 12px;
+        border: 2px dashed #dee2e6;
+        transition: all 0.2s ease;
+        touch-action: manipulation;
+    }
+    
+    .photo-slot:active {
+        transform: scale(0.95);
+        border-color: #00b894;
+    }
+    
+    .photo-placeholder {
+        font-size: 12px;
+        color: #6c757d;
+    }
+    
+    .remove-photo {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+        top: 6px;
+        right: 6px;
+        border-radius: 14px;
+        touch-action: manipulation;
+    }
+    
+    .remove-photo:active {
+        transform: scale(0.9);
+    }
+    
+    /* Actions formulaire mobile */
+    .form-actions {
+        padding: 16px;
+        border-top: 1px solid #e9ecef;
+        display: flex;
+        gap: 12px;
+        position: sticky;
+        bottom: 0;
+        background: white;
+    }
+    
+    .form-actions button {
+        flex: 1;
+        height: 52px;
+        font-size: 16px;
+        border-radius: 26px;
+        font-weight: 600;
+        touch-action: manipulation;
+        transition: all 0.2s ease;
+    }
+    
+    .form-actions button:active {
+        transform: scale(0.95);
+    }
+    
+    /* Footer mobile */
+    .footer {
+        padding: 24px 16px;
+        text-align: center;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+        gap: 24px;
+    }
+    
+    .footer-section h3 {
+        font-size: 16px;
+        margin-bottom: 12px;
+        font-weight: 600;
+    }
+    
+    .footer-section ul {
+        gap: 12px;
+    }
+    
+    .footer-section li {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .footer-bottom {
+        margin-top: 24px;
+        padding-top: 20px;
+        font-size: 12px;
+        color: #6c757d;
+    }
+    
+    /* Boutons mobile */
+    .btn-primary, .btn-secondary {
+        height: 48px;
+        font-size: 16px;
+        padding: 0 20px;
+        border-radius: 24px;
+        font-weight: 600;
+        touch-action: manipulation;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .btn-primary:active, .btn-secondary:active {
+        transform: scale(0.95);
+    }
+    
+    /* Messages mobile */
+    .message {
+        padding: 16px 20px;
+        font-size: 14px;
+        border-radius: 12px;
+        margin: 12px;
+        line-height: 1.4;
+    }
+    
+    /* Loading mobile */
+    .loading {
+        padding: 60px 16px;
+        font-size: 16px;
+        text-align: center;
+        color: #6c757d;
+    }
+    
+    /* Animations mobile optimisées */
+    .product-card {
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    .filter-panel {
+        transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .modal-content {
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Scrollbar mobile personnalisée */
+    ::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 2px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+}
+
+/* Responsive - TABLETTE */
+@media (min-width: 768px) and (max-width: 1023px) {
     .products-grid {
         grid-template-columns: repeat(3, 1fr);
         gap: 16px;
+        padding: 16px;
+    }
+    
+    .main-content {
+        padding: 16px;
+        padding-bottom: 100px;
+    }
+    
+    .product-image {
+        height: 250px;
+    }
+    
+    .filter-panel {
+        width: 350px;
+        right: -350px;
+    }
+    
+    .photo-upload {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    
+    .photo-slot {
+        height: 140px;
+    }
+}
+
+/* Responsive - DESKTOP */
+@media (min-width: 1024px) {
+    .products-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        padding: 20px;
     }
     
     .main-content {
         padding: 24px;
         padding-bottom: 120px;
     }
-}
-
-@media (min-width: 1024px) {
-    .products-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 20px;
+    
+    .product-image {
+        height: 300px;
     }
     
     .filter-panel {
         width: 400px;
         right: -400px;
+    }
+    
+    .photo-upload {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+    
+    .photo-slot {
+        height: 160px;
     }
 }
 

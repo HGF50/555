@@ -832,7 +832,85 @@ function filterAndSortProducts() {
 }
 
 function sortProducts() {
-    console.log('Tri des produits');
+    console.log('🔄 Tri des produits par marques...');
+    
+    const sortValue = document.getElementById('sortSelect').value;
+    console.log('Type de tri demandé:', sortValue);
+    
+    if (!filteredProducts || filteredProducts.length === 0) {
+        console.log('❌ Aucun produit à trier');
+        return;
+    }
+    
+    let sortedProducts = [...filteredProducts];
+    
+    switch(sortValue) {
+        case 'brand-asc':
+            // Tri par marques A-Z
+            sortedProducts.sort((a, b) => {
+                const brandA = (a.brand || '').toLowerCase();
+                const brandB = (b.brand || '').toLowerCase();
+                return brandA.localeCompare(brandB);
+            });
+            console.log('✅ Tri par marques A-Z effectué');
+            break;
+            
+        case 'brand-desc':
+            // Tri par marques Z-A
+            sortedProducts.sort((a, b) => {
+                const brandA = (a.brand || '').toLowerCase();
+                const brandB = (b.brand || '').toLowerCase();
+                return brandB.localeCompare(brandA);
+            });
+            console.log('✅ Tri par marques Z-A effectué');
+            break;
+            
+        case 'price-low':
+            // Tri par prix croissant
+            sortedProducts.sort((a, b) => a.price - b.price);
+            console.log('✅ Tri par prix croissant effectué');
+            break;
+            
+        case 'price-high':
+            // Tri par prix décroissant
+            sortedProducts.sort((a, b) => b.price - a.price);
+            console.log('✅ Tri par prix décroissant effectué');
+            break;
+            
+        case 'relevant':
+        default:
+            // Tri par pertinence (marques populaires d'abord)
+            const popularBrands = ['nike', 'adidas', 'zara', 'h&m', 'chanel', 'gucci', 'versace', 'prada', 'dior', 'louis vuitton'];
+            sortedProducts.sort((a, b) => {
+                const brandA = (a.brand || '').toLowerCase();
+                const brandB = (b.brand || '').toLowerCase();
+                
+                const indexA = popularBrands.indexOf(brandA);
+                const indexB = popularBrands.indexOf(brandB);
+                
+                // Si les deux marques sont populaires, trier par ordre de popularité
+                if (indexA !== -1 && indexB !== -1) {
+                    return indexA - indexB;
+                }
+                
+                // Si seulement une marque est populaire, la mettre en premier
+                if (indexA !== -1) return -1;
+                if (indexB !== -1) return 1;
+                
+                // Si aucune n'est populaire, trier alphabétiquement
+                return brandA.localeCompare(brandB);
+            });
+            console.log('✅ Tri par pertinence (marques populaires) effectué');
+            break;
+    }
+    
+    // Mettre à jour filteredProducts avec le résultat trié
+    filteredProducts = sortedProducts;
+    
+    // Réafficher les produits triés
+    renderProducts();
+    
+    console.log('📊 Produits triés et réaffichés:', filteredProducts.length);
 }
 
 function applyFilters() {

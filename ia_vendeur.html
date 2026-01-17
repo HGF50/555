@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IA Vendeur - Vinted Clone</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .ia-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .ia-header {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .ia-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .ia-subtitle {
+            font-size: 16px;
+            color: #6c757d;
+            margin-bottom: 24px;
+        }
+
+        .ia-stats {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #00b894;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        /* Zone principale */
+        .ia-main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        /* Zone de chat IA */
+        .ia-chat {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .ia-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00b894 0%, #00a884 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .ia-info {
+            flex: 1;
+        }
+
+        .ia-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 4px;
+        }
+
+        .ia-status {
+            font-size: 14px;
+            color: #00b894;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #00b894;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 0;
+            margin-bottom: 16px;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 16px;
+            animation: messageSlide 0.3s ease;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.ia {
+            justify-content: flex-start;
+        }
+
+        .message-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.4;
+        }
+
+        .message.user .message-bubble {
+            background: #00b894;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.ia .message-bubble {
+            background: #f8f9fa;
+            color: #212529;
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #6c757d;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .message.ia .message-time {
+            text-align: left;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .chat-input-field {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 24px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input-field:focus {
+            border-color: #00b894;
+        }
+
+        .chat-send-btn {
+            width: 48px;
+            height: 48px;
+            border: none;
+            background: #00b894;
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+
+        .chat-send-btn:hover {
+            background: #00a884;
+        }
+
+        .chat-send-btn:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        /* Messages avec photos */
+        .message-photo {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .message-photo:hover {
+            transform: scale(1.02);
+        }
+
+        .message-with-photo .message-bubble {
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-with-photo.sent .message-bubble {
+            border-bottom-right-radius: 4px;
+        }
+
+        /* Modal photo */
+        .photo-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .photo-modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+        }
+
+        .photo-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        /* Zone de drag & drop */
+        .drop-zone {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 184, 148, 0.1);
+            border: 2px dashed #00b894;
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .drop-zone.active {
+            display: flex;
+        }
+
+        .drop-zone-text {
+            font-size: 24px;
+            color: #00b894;
+            margin-bottom: 16px;
+        }
+
+        .drop-zone-subtext {
+            font-size: 16px;
+            color: #6c757d;
+        }
+
+        /* Zone d'outils */
+        .ia-tools {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .tools-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .tool-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .tool-card:hover {
+            border-color: #00b894;
+            background: #e3f2fd;
+            transform: translateY(-2px);
+        }
+
+        .tool-icon {
+            font-size: 24px;
+            color: #00b894;
+            margin-bottom: 8px;
+        }
+
+        .tool-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 4px;
+        }
+
+        .tool-description {
+            font-size: 12px;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        /* Zone de suggestions */
+        .ia-suggestions {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            grid-column: 1 / -1;
+        }
+
+        .suggestions-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .suggestion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .suggestion-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 16px;
+            border-left: 4px solid #00b894;
+        }
+
+        .suggestion-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 8px;
+        }
+
+        .suggestion-text {
+            font-size: 14px;
+            color: #6c757d;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .suggestion-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .suggestion-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .suggestion-btn.apply {
+            background: #00b894;
+            color: white;
+        }
+
+        .suggestion-btn.apply:hover {
+            background: #00a884;
+        }
+
+        .suggestion-btn.dismiss {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+
+        .suggestion-btn.dismiss:hover {
+            background: #dee2e6;
+        }
+
+        /* Typing indicator */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            max-width: 80px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #6c757d;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .ia-main {
+                grid-template-columns: 1fr;
+            }
+
+            .ia-stats {
+                gap: 16px;
+            }
+
+            .tool-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .suggestion-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scrollbar */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #dee2e6;
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #ced4da;
+        }
+    </style>
+</head>
+<body>
+    <div class="ia-container">
+        <!-- Header -->
+        <div class="ia-header">
+            <div class="ia-title">
+                <i class="fas fa-robot"></i>
+                IA Vendeur Intelligent
+            </div>
+            <div class="ia-subtitle">
+                Votre assistant personnel pour optimiser vos ventes sur Vinted Clone
+            </div>
+            <div class="ia-stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalVentes">0</div>
+                    <div class="stat-label">Ventes optimisées</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="suggestionsCount">0</div>
+                    <div class="stat-label">Suggestions données</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="gainMoyen">0%</div>
+                    <div class="stat-label">Gain moyen</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Zone principale -->
+        <div class="ia-main">
+            <!-- Chat IA -->
+            <div class="ia-chat">
+                <div class="chat-header">
+                    <div class="ia-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="ia-info">
+                        <div class="ia-name">Assistant Vendeur IA</div>
+                        <div class="ia-status">
+                            <div class="status-dot"></div>
+                            En ligne et prêt à vous aider
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message ia">
+                        <div class="message-bubble">
+                            Bonjour ! Je suis votre assistant vendeur IA. Je peux vous aider à optimiser vos ventes, analyser le marché, suggérer des prix et améliorer vos descriptions. Comment puis-je vous aider aujourd'hui ?
+                        </div>
+                        <div class="message-time">12:00</div>
+                    </div>
+                </div>
+
+                <div class="chat-input">
+                    <input type="text" class="chat-input-field" id="chatInput" placeholder="Demandez-moi n'importe quoi sur vos ventes..." onkeypress="handleKeyPress(event)">
+                    <button class="chat-send-btn" id="sendBtn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Outils IA -->
+            <div class="ia-tools">
+                <div class="tools-title">
+                    <i class="fas fa-magic"></i>
+                    Outils IA
+                </div>
+                <div class="tool-grid">
+                    <div class="tool-card" onclick="analyzeProduct()">
+                        <div class="tool-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="tool-name">Analyser un produit</div>
+                        <div class="tool-description">
+                            Analysez la performance et suggérez des améliorations
+                        </div>
+                    </div>
+                    <div class="tool-card" onclick="suggestPrice()">
+                        <div class="tool-icon">
+                            <i class="fas fa-tag"></i>
+                        </div>
+                        <div class="tool-name">Suggérer un prix</div>
+                        <div class="tool-description">
+                            Obtenez le prix optimal basé sur le marché
+                        </div>
+                    </div>
+                    <div class="tool-card" onclick="optimizeDescription()">
+                        <div class="tool-icon">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                        <div class="tool-name">Optimiser description</div>
+                        <div class="tool-description">
+                            Améliorez vos descriptions pour plus de ventes
+                        </div>
+                    </div>
+                    <div class="tool-card" onclick="marketTrends()">
+                        <div class="tool-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="tool-name">Tendances du marché</div>
+                        <div class="tool-description">
+                            Découvrez les tendances actuelles de la mode
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Suggestions IA -->
+        <div class="ia-suggestions">
+            <div class="suggestions-title">
+                <i class="fas fa-lightbulb"></i>
+                Suggestions personnalisées
+            </div>
+            <div class="suggestion-grid" id="suggestionsGrid">
+                <!-- Suggestions générées ici -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour afficher les photos -->
+    <div class="photo-modal" id="photoModal" onclick="closePhotoModal()">
+        <button class="photo-modal-close" onclick="closePhotoModal()">
+            <i class="fas fa-times"></i>
+        </button>
+        <img class="photo-modal-content" id="photoModalContent" src="" alt="Photo agrandie">
+    </div>
+
+    <!-- Zone de drag & drop -->
+    <div class="drop-zone" id="dropZone">
+        <div class="drop-zone-text">
+            <i class="fas fa-cloud-upload-alt"></i>
+        </div>
+        <div class="drop-zone-subtext">Déposez votre photo ici</div>
+    </div>
+
+    <!-- Input caché pour les photos -->
+    <input type="file" id="photoInput" accept="image/*" style="display: none;" onchange="handlePhotoSelect(event)">
+
+    <script>
+        // Données et état
+        let messages = [];
+        let isTyping = false;
+        let stats = {
+            totalVentes: 127,
+            suggestionsCount: 45,
+            gainMoyen: 23
+        };
+
+        // Réponses IA prédéfinies
+        const iaResponses = {
+            greeting: [
+                "Bonjour ! Je suis votre assistant vendeur IA. Je peux vous aider à optimiser vos ventes, analyser le marché, suggérer des prix et améliorer vos descriptions. Comment puis-je vous aider aujourd'hui ?",
+                "Bonjour ! Je suis là pour vous aider à maximiser vos ventes. Posez-moi vos questions sur la tarification, les descriptions, les tendances ou toute autre stratégie de vente."
+            ],
+            price: [
+                "Basé sur l'analyse du marché actuel, je vous suggère un prix entre {price} FCFA. Ce prix est optimal pour maximiser vos ventes tout en maintenant une bonne marge.",
+                "Après analyse des produits similaires, le prix recommandé est de {price} FCFA. Ce positionnement vous permettra d'être compétitif tout en valorisant votre article.",
+                "Le prix idéal pour cet article serait {price} FCFA. Ce tarif se situe dans la moyenne du marché et devrait générer beaucoup d'intérêt."
+            ],
+            description: [
+                "Voici une description optimisée : {description}. Cette version met en avant les avantages clés et utilise des mots-clés recherchés par les acheteurs.",
+                "J'ai amélioré votre description : {description}. Elle est maintenant plus percutante et optimisée pour les algorithmes de recherche."
+            ],
+            trends: [
+                "Les tendances actuelles incluent : {trends}. Intégrer ces éléments dans vos annonces peut augmenter leur visibilité de 40%.",
+                "Pour le moment, les acheteurs recherchent particulièrement : {trends}. C'est le moment idéal pour vendre ces articles."
+            ],
+            general: [
+                "C'est une excellente question ! Basé sur mon analyse de milliers de ventes réussies, je vous recommande de {answer}.",
+                "Intéressant ! Selon les données du marché, la meilleure approche serait de {answer}.",
+                "Je comprends votre préoccupation. Voici ce que je suggère : {answer}."
+            ]
+        };
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+            generateSuggestions();
+            setupDragAndDrop();
+        });
+
+        function updateStats() {
+            document.getElementById('totalVentes').textContent = stats.totalVentes;
+            document.getElementById('suggestionsCount').textContent = stats.suggestionsCount;
+            document.getElementById('gainMoyen').textContent = stats.gainMoyen + '%';
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message || isTyping) return;
+            
+            // Ajouter message utilisateur
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Afficher indicateur de frappe
+            showTypingIndicator();
+            
+            // Simuler réponse IA
+            setTimeout(() => {
+                hideTypingIndicator();
+                generateIAResponse(message);
+            }, 1500);
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function addMessage(text, sender, photo = null) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            
+            const messageHTML = `
+                <div class="message ${sender} ${photo ? 'message-with-photo' : ''}">
+                    ${photo ? `
+                        <img class="message-photo" src="${photo}" alt="Photo du message" onclick="openPhotoModal('${photo}')">
+                    ` : ''}
+                    ${text ? `
+                        <div class="message-bubble">${text}</div>
+                    ` : ''}
+                    <div class="message-time">${time}</div>
+                </div>
+            `;
+            
+            messagesContainer.innerHTML += messageHTML;
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            messages.push({ text, sender, time, photo });
+        }
+
+        function showTypingIndicator() {
+            isTyping = true;
+            const messagesContainer = document.getElementById('chatMessages');
+            
+            const typingHTML = `
+                <div class="message ia" id="typingIndicator">
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            `;
+            
+            messagesContainer.innerHTML += typingHTML;
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            isTyping = false;
+            const typingIndicator = document.getElementById('typingIndicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        function generateIAResponse(userMessage) {
+            const lowerMessage = userMessage.toLowerCase();
+            let response = '';
+            
+            // Détection de l'intention
+            if (lowerMessage.includes('prix') || lowerMessage.includes('combien') || lowerMessage.includes('valeur')) {
+                const price = Math.floor(Math.random() * 50000) + 10000;
+                response = iaResponses.price[Math.floor(Math.random() * iaResponses.price.length)]
+                    .replace('{price}', price.toLocaleString());
+            } else if (lowerMessage.includes('description') || lowerMessage.includes('texte') || lowerMessage.includes('annonc')) {
+                const descriptions = [
+                    "Superbe article en excellent état, parfait pour la saison actuelle. Matière de qualité et design tendance. Livraison rapide possible.",
+                    "Article tendance à prix imbattable. État comme neuf, porté une seule fois. Idéal pour les amateurs de mode.",
+                    "Pièce unique et originale. Très bon état, entretien facile. S'adapte à toutes les occasions. Ne manquez pas cette occasion !"
+                ];
+                response = iaResponses.description[Math.floor(Math.random() * iaResponses.description.length)]
+                    .replace('{description}', descriptions[Math.floor(Math.random() * descriptions.length)]);
+            } else if (lowerMessage.includes('tendance') || lowerMessage.includes('mode') || lowerMessage.includes('populaire')) {
+                const trends = [
+                    "les robes d'été florales, les baskets vintage et les sacs en cuir",
+                    "les oversized, les couleurs pastel et les accessoires rétro",
+                    "les vêtements durables, les coupes amples et les matières recyclées"
+                ];
+                response = iaResponses.trends[Math.floor(Math.random() * iaResponses.trends.length)]
+                    .replace('{trends}', trends[Math.floor(Math.random() * trends.length)]);
+            } else {
+                const answers = [
+                    "analyser vos produits un par un pour identifier les meilleures opportunités",
+                    "créer des descriptions plus percutantes avec des mots-clés optimisés",
+                    "ajuster vos prix en fonction de la demande du marché",
+                    "surveiller les tendances saisonnières pour anticiper les demandes",
+                    "optimiser vos photos pour attirer plus d'acheteurs"
+                ];
+                response = iaResponses.general[Math.floor(Math.random() * iaResponses.general.length)]
+                    .replace('{answer}', answers[Math.floor(Math.random() * answers.length)]);
+            }
+            
+            addMessage(response, 'ia');
+            stats.suggestionsCount++;
+            updateStats();
+        }
+
+        // Fonctions pour les photos
+        function attachFile() {
+            console.log('📎 Pièce jointe IA');
+            document.getElementById('photoInput').click();
+        }
+
+        function handlePhotoSelect(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                    sendPhotoToIA(file);
+                } else {
+                    alert('Veuillez sélectionner une image valide');
+                }
+            }
+        }
+
+        function sendPhotoToIA(file) {
+            console.log('📸 Envoi de photo à l\'IA:', file.name);
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const photoUrl = e.target.result;
+                
+                // Ajouter la photo de l'utilisateur
+                addMessage('', 'user', photoUrl);
+                
+                // Afficher indicateur de frappe
+                showTypingIndicator();
+                
+                // Simuler analyse IA
+                setTimeout(() => {
+                    hideTypingIndicator();
+                    generatePhotoAnalysis(file.name, photoUrl);
+                }, 2000);
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        function generatePhotoAnalysis(fileName, photoUrl) {
+            const analyses = [
+                `📸 **Analyse de l'image : ${fileName}**\n\n✅ **Qualité** : Excellente (résolution et luminosité)\n🎨 **Composition** : Très équilibrée\n👗 **Article détecté** : Vêtement de mode\n💡 **Suggestion** : Photo parfaite pour une annonce Vinted !\n\n🚀 **Recommandations** :\n• Ajoutez des photos sous différents angles\n• Montrez les détails et l'état\n• Photo idéale pour attirer les acheteurs`,
+                
+                `🔍 **Analyse IA de votre photo**\n\n📊 **Score global** : 9.2/10 ⭐\n🎯 **Atouts** : Bonne lumière, angle professionnel\n👀 **Points forts** : Couleurs fidèles, détails visibles\n💰 **Impact potentiel** : +35% de ventes\n\n✨ **Optimisations suggérées** :\n• Ajoutez une photo portée (si vêtement)\n• Montrez l'étiquette/marque\n• Photo de près pour les textures`,
+                
+                `🤖 **Diagnostic intelligent**\n\n📸 **Qualité technique** : Très bonne\n🎨 **Esthétique** : Moderne et attrayante\n💼 **Potentiel commercial** : Élevé\n⚡ **Performance attendue** : Vente rapide\n\n🎯 **Stratégie recommandée** :\n• Prix : 15-20% au-dessus du marché\n• Description : Mettre en avant la qualité visible\n• Cible : Acheteurs exigeants`
+            ];
+            
+            const randomAnalysis = analyses[Math.floor(Math.random() * analyses.length)];
+            
+            addMessage(randomAnalysis, 'ia');
+            stats.suggestionsCount++;
+            stats.totalVentes += 2;
+            updateStats();
+        }
+
+        function openPhotoModal(photoUrl) {
+            const modal = document.getElementById('photoModal');
+            const modalContent = document.getElementById('photoModalContent');
+            
+            modalContent.src = photoUrl;
+            modal.style.display = 'flex';
+        }
+
+        function closePhotoModal() {
+            const modal = document.getElementById('photoModal');
+            modal.style.display = 'none';
+        }
+
+        // Drag & drop pour l'IA
+        function setupDragAndDrop() {
+            const dropZone = document.getElementById('dropZone');
+            const chatMessages = document.getElementById('chatMessages');
+            
+            if (!dropZone || !chatMessages) return;
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                chatMessages.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                chatMessages.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                chatMessages.addEventListener(eventName, unhighlight, false);
+            });
+            
+            chatMessages.addEventListener('drop', handleDrop, false);
+        }
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function highlight(e) {
+            document.getElementById('dropZone').classList.add('active');
+        }
+
+        function unhighlight(e) {
+            document.getElementById('dropZone').classList.remove('active');
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                    sendPhotoToIA(file);
+                } else {
+                    alert('Veuillez déposer une image valide');
+                }
+            }
+        }
+
+        // Outils IA
+        function analyzeProduct() {
+            addMessage("Lancez l'analyse d'un produit...", 'user');
+            showTypingIndicator();
+            
+            setTimeout(() => {
+                hideTypingIndicator();
+                const response = "J'analyse votre produit : ✅ **Performance** : 4.2/5 ⭐ **Popularité** : Moyenne 📈 **Prix** : 15% sous le marché 💡 **Suggestion** : Ajoutez plus de photos et améliorez la description pour augmenter les ventes de 35%";
+                addMessage(response, 'ia');
+                stats.suggestionsCount++;
+                updateStats();
+            }, 2000);
+        }
+
+        function suggestPrice() {
+            addMessage("Donne-moi le prix idéal pour mon article...", 'user');
+            showTypingIndicator();
+            
+            setTimeout(() => {
+                hideTypingIndicator();
+                const price = Math.floor(Math.random() * 30000) + 8000;
+                const response = `Prix recommandé : **${price.toLocaleString()} FCFA** 💰\n\nBasé sur l'analyse de 127 articles similaires :\n• Prix moyen : ${(price * 1.2).toLocaleString()} FCFA\n• Prix le plus bas : ${(price * 0.8).toLocaleString()} FCFA\n• Votre prix : **${price.toLocaleString()} FCFA** (optimal)`;
+                addMessage(response, 'ia');
+                stats.suggestionsCount++;
+                updateStats();
+            }, 2000);
+        }
+
+        function optimizeDescription() {
+            addMessage("Optimise ma description de vente...", 'user');
+            showTypingIndicator();
+            
+            setTimeout(() => {
+                hideTypingIndicator();
+                const response = "Voici votre description optimisée :\n\n🌟 **Magnifique robe d'été** - Tendance 2024 !\n\n✅ **État** : Comme neuf (porté 1 fois)\n✅ **Taille** : M (s'adapte parfaitement)\n✅ **Couleur** : Bleu marine intense\n✅ **Matière** : Coton respirant de qualité\n\n🎯 **Parfait pour** : Vacances, soirées, événements spéciaux\n🚀 **Livraison** : Rapide et soignée\n\n⚡ **Action immédiate** - Prix exceptionnel pour qualité premium !";
+                addMessage(response, 'ia');
+                stats.suggestionsCount++;
+                updateStats();
+            }, 2000);
+        }
+
+        function marketTrends() {
+            addMessage("Montre-moi les tendances actuelles...", 'user');
+            showTypingIndicator();
+            
+            setTimeout(() => {
+                hideTypingIndicator();
+                const response = "🔥 **TENDANCES ACTUELLES** 🔥\n\n👗 **Vêtements femme** :\n• Robes longues florales (+45% de demande)\n• Oversized et coupes amples (+38%)\n• Couleurs pastel (+52%)\n\n👕 **Vêtements homme** :\n• Chemises vintage (+29%)\n• Jeans loose fit (+41%)\n• Sneakers rétro (+67%)\n\n👜 **Accessoires** :\n• Sacs en cuir artisanal (+33%)\n• Bijoux minimalistes (+28%)\n• Lunettes vintage (+44%)\n\n💡 **Opportunités** : Concentrez-vous sur ces catégories pour maximiser vos ventes !";
+                addMessage(response, 'ia');
+                stats.suggestionsCount++;
+                updateStats();
+            }, 2000);
+        }
+
+        function generateSuggestions() {
+            const suggestions = [
+                {
+                    title: "Optimiser les prix",
+                    text: "J'ai détecté que 3 de vos articles sont sous-évalués. Augmentez leurs prix de 15-20% pour maximiser vos profits.",
+                    action: "apply"
+                },
+                {
+                    title: "Améliorer les photos",
+                    text: "Vos photos manquent de luminosité. Utilisez la lumière naturelle et un fond neutre pour augmenter l'attractivité de 40%.",
+                    action: "apply"
+                },
+                {
+                    title: "Mots-clés manquants",
+                    text: "Ajoutez des mots-clés tendance comme 'vintage', 'unique', 'artisanal' dans vos descriptions pour améliorer votre référencement.",
+                    action: "apply"
+                }
+            ];
+            
+            const suggestionsGrid = document.getElementById('suggestionsGrid');
+            suggestionsGrid.innerHTML = suggestions.map((suggestion, index) => `
+                <div class="suggestion-card">
+                    <div class="suggestion-title">${suggestion.title}</div>
+                    <div class="suggestion-text">${suggestion.text}</div>
+                    <div class="suggestion-actions">
+                        <button class="suggestion-btn apply" onclick="applySuggestion(${index})">
+                            <i class="fas fa-check"></i> Appliquer
+                        </button>
+                        <button class="suggestion-btn dismiss" onclick="dismissSuggestion(${index})">
+                            <i class="fas fa-times"></i> Ignorer
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function applySuggestion(index) {
+            addMessage("J'applique la suggestion...", 'user');
+            showTypingIndicator();
+            
+            setTimeout(() => {
+                hideTypingIndicator();
+                addMessage("✅ **Suggestion appliquée avec succès !**\n\nJ'ai automatiquement mis à jour vos articles selon les recommandations. Vous devriez voir une amélioration des performances d'ici 24-48h.", 'ia');
+                stats.totalVentes += 5;
+                stats.gainMoyen += 2;
+                updateStats();
+                
+                // Masquer la suggestion appliquée
+                const suggestionCards = document.querySelectorAll('.suggestion-card');
+                if (suggestionCards[index]) {
+                    suggestionCards[index].style.opacity = '0.5';
+                    suggestionCards[index].style.pointerEvents = 'none';
+                }
+            }, 1500);
+        }
+
+        function dismissSuggestion(index) {
+            const suggestionCards = document.querySelectorAll('.suggestion-card');
+            if (suggestionCards[index]) {
+                suggestionCards[index].style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

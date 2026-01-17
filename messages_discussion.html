@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - Vinted Clone</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            background: white;
+        }
+
+        /* Header */
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #212529;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #212529;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .back-btn:hover {
+            background: #f8f9fa;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: white;
+            border-right: 1px solid #e9ecef;
+            overflow-y: auto;
+            padding-top: 60px;
+            height: 100vh;
+        }
+
+        .conversation-list {
+            padding: 0;
+        }
+
+        .conversation-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #f8f9fa;
+            position: relative;
+        }
+
+        .conversation-item:hover {
+            background: #f8f9fa;
+        }
+
+        .conversation-item.active {
+            background: #e3f2fd;
+            border-left: 3px solid #00b894;
+        }
+
+        .conversation-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+            margin-right: 12px;
+            flex-shrink: 0;
+            font-size: 16px;
+        }
+
+        .conversation-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .conversation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .conversation-name {
+            font-weight: 600;
+            color: #212529;
+            font-size: 14px;
+        }
+
+        .conversation-meta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .conversation-time {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .unread-badge {
+            background: #ff6b6b;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .conversation-last-message {
+            font-size: 13px;
+            color: #6c757d;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Zone de discussion */
+        .discussion-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding-top: 60px;
+            background: #f8f9fa;
+        }
+
+        .discussion-header {
+            background: white;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .discussion-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+            font-size: 14px;
+        }
+
+        .discussion-info {
+            flex: 1;
+        }
+
+        .discussion-name {
+            font-weight: 600;
+            color: #212529;
+            font-size: 16px;
+            margin-bottom: 2px;
+        }
+
+        .discussion-status {
+            font-size: 12px;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #4caf50;
+            border-radius: 50%;
+        }
+
+        .status-dot.offline {
+            background: #6c757d;
+        }
+
+        /* Messages de discussion */
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .date-separator {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .date-separator span {
+            background: #f8f9fa;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #6c757d;
+            border: 1px solid #e9ecef;
+        }
+
+        .message-group {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 8px;
+            max-width: 70%;
+            animation: messageSlide 0.3s ease;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.sent {
+            margin-left: auto;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .message.received {
+            margin-right: auto;
+        }
+
+        .message-bubble {
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 100%;
+            word-wrap: break-word;
+            line-height: 1.4;
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .message.sent .message-bubble {
+            background: linear-gradient(135deg, #00b894 0%, #00a884 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.received .message-bubble {
+            background: white;
+            color: #212529;
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-info {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 4px;
+            font-size: 11px;
+            color: #6c757d;
+        }
+
+        .message.sent .message-info {
+            flex-direction: row-reverse;
+        }
+
+        .message-time {
+            white-space: nowrap;
+        }
+
+        .message-status {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .status-check {
+            font-size: 10px;
+        }
+
+        .status-check.read {
+            color: #00b894;
+        }
+
+        .status-check.unread {
+            color: #6c757d;
+        }
+
+        /* Zone de saisie */
+        .input-area {
+            background: white;
+            border-top: 1px solid #e9ecef;
+            padding: 16px 20px;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f8f9fa;
+            border-radius: 24px;
+            padding: 8px;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: #00b894;
+            background: white;
+        }
+
+        .message-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            outline: none;
+            padding: 8px 12px;
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .input-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: none;
+            color: #6c757d;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .input-btn:hover {
+            background: #e9ecef;
+            color: #212529;
+        }
+
+        .send-btn {
+            background: #00b894;
+            color: white;
+        }
+
+        .send-btn:hover {
+            background: #00a884;
+        }
+
+        /* Messages avec photos */
+        .message-photo {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .message-photo:hover {
+            transform: scale(1.02);
+        }
+
+        .message-with-photo .message-bubble {
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-with-photo.sent .message-bubble {
+            border-bottom-right-radius: 4px;
+        }
+
+        /* Modal photo */
+        .photo-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .photo-modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+        }
+
+        .photo-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        /* Zone de drag & drop */
+        .drop-zone {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 184, 148, 0.1);
+            border: 2px dashed #00b894;
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .drop-zone.active {
+            display: flex;
+        }
+
+        .drop-zone-text {
+            font-size: 24px;
+            color: #00b894;
+            margin-bottom: 16px;
+        }
+
+        .drop-zone-subtext {
+            font-size: 16px;
+            color: #6c757d;
+        }
+
+        /* Empty state */
+        .empty-discussion {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #6c757d;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            color: #dee2e6;
+            margin-bottom: 20px;
+        }
+
+        .empty-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #212529;
+        }
+
+        .empty-text {
+            font-size: 14px;
+            color: #6c757d;
+            line-height: 1.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -320px;
+                top: 60px;
+                height: calc(100vh - 60px);
+                z-index: 999;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.show {
+                left: 0;
+            }
+
+            .discussion-area {
+                width: 100%;
+            }
+
+            .message {
+                max-width: 85%;
+            }
+
+            .input-area {
+                padding: 12px 16px;
+            }
+        }
+
+        /* Scrollbar personnalisée */
+        .messages-container::-webkit-scrollbar,
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .messages-container::-webkit-scrollbar-track,
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb,
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #dee2e6;
+            border-radius: 3px;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb:hover,
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #ced4da;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="app-header">
+        <button class="back-btn" onclick="window.location.href='index.html'">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h1 class="header-title">
+            <i class="fas fa-comments"></i>
+            Messages
+        </h1>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar des conversations -->
+        <div class="sidebar" id="sidebar">
+            <div class="conversation-list" id="conversationList">
+                <!-- Conversations chargées ici -->
+            </div>
+        </div>
+
+        <!-- Zone de discussion -->
+        <div class="discussion-area" id="discussionArea">
+            <div class="empty-discussion" id="emptyState">
+                <div class="empty-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div class="empty-title">Aucune discussion</div>
+                <div class="empty-text">
+                    Choisissez une conversation pour voir les messages
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour afficher les photos -->
+    <div class="photo-modal" id="photoModal" onclick="closePhotoModal()">
+        <button class="photo-modal-close" onclick="closePhotoModal()">
+            <i class="fas fa-times"></i>
+        </button>
+        <img class="photo-modal-content" id="photoModalContent" src="" alt="Photo agrandie">
+    </div>
+
+    <!-- Zone de drag & drop -->
+    <div class="drop-zone" id="dropZone">
+        <div class="drop-zone-text">
+            <i class="fas fa-cloud-upload-alt"></i>
+        </div>
+        <div class="drop-zone-subtext">Déposez votre photo ici</div>
+    </div>
+
+    <!-- Input caché pour les photos -->
+    <input type="file" id="photoInput" accept="image/*" style="display: none;" onchange="handlePhotoSelect(event)">
+
+    <script>
+        // Données de discussion
+        const discussions = [
+            {
+                id: 1,
+                name: "Marie Dubois",
+                avatar: "MD",
+                lastMessage: "Super ! Je suis intéressée par votre robe",
+                time: "14:30",
+                unread: 2,
+                online: true,
+                messages: [
+                    { id: 1, text: "Bonjour, je suis intéressée par votre robe", sent: false, time: "14:25", date: "Aujourd'hui" },
+                    { id: 2, text: "Bonjour ! Elle est toujours disponible ?", sent: true, time: "14:28", date: "Aujourd'hui" },
+                    { id: 3, text: "Super ! Je suis intéressée par votre robe", sent: false, time: "14:30", date: "Aujourd'hui" }
+                ]
+            },
+            {
+                id: 2,
+                name: "Paul Martin",
+                avatar: "PM",
+                lastMessage: "Merci pour la réponse rapide",
+                time: "Hier",
+                unread: 0,
+                online: false,
+                messages: [
+                    { id: 1, text: "Bonjour, les baskets sont toujours disponibles ?", sent: false, time: "15:20", date: "Hier" },
+                    { id: 2, text: "Oui, elles sont disponibles !", sent: true, time: "15:25", date: "Hier" },
+                    { id: 3, text: "Merci pour la réponse rapide", sent: false, time: "15:30", date: "Hier" }
+                ]
+            },
+            {
+                id: 3,
+                name: "Sophie Laurent",
+                avatar: "SL",
+                lastMessage: "Pouvez-vous me donner plus de détails ?",
+                time: "2 jours",
+                unread: 1,
+                online: true,
+                messages: [
+                    { id: 1, text: "Bonjour, j'aime beaucoup votre sac", sent: false, time: "10:15", date: "2 jours" },
+                    { id: 2, text: "Merci ! Il est en très bon état", sent: true, time: "10:20", date: "2 jours" },
+                    { id: 3, text: "Pouvez-vous me donner plus de détails ?", sent: false, time: "10:25", date: "2 jours" }
+                ]
+            }
+        ];
+
+        let currentDiscussion = null;
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Messages discussion chargé');
+            renderConversations();
+            setupDragAndDrop();
+        });
+
+        function renderConversations() {
+            console.log('📝 Rendu des conversations');
+            const conversationList = document.getElementById('conversationList');
+            
+            conversationList.innerHTML = discussions.map(discussion => `
+                <div class="conversation-item ${currentDiscussion?.id === discussion.id ? 'active' : ''}" onclick="openDiscussion(${discussion.id})">
+                    <div class="conversation-avatar">${discussion.avatar}</div>
+                    <div class="conversation-content">
+                        <div class="conversation-header">
+                            <div class="conversation-name">${discussion.name}</div>
+                            <div class="conversation-meta">
+                                <span class="conversation-time">${discussion.time}</span>
+                                ${discussion.unread > 0 ? `<span class="unread-badge">${discussion.unread}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="conversation-last-message">${discussion.lastMessage}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            console.log('✅ Conversations affichées');
+        }
+
+        function openDiscussion(discussionId) {
+            console.log('💬 Ouverture discussion:', discussionId);
+            
+            currentDiscussion = discussions.find(d => d.id === discussionId);
+            
+            if (!currentDiscussion) {
+                console.error('❌ Discussion non trouvée');
+                return;
+            }
+            
+            // Marquer comme lu
+            currentDiscussion.unread = 0;
+            
+            console.log('📨 Messages à afficher:', currentDiscussion.messages.length);
+            
+            // Mettre à jour l'affichage
+            renderConversations();
+            renderDiscussion();
+            
+            // Mobile: cacher sidebar
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('show');
+            }
+        }
+
+        function renderDiscussion() {
+            console.log('🎨 Rendu de la discussion');
+            const discussionArea = document.getElementById('discussionArea');
+            
+            if (!currentDiscussion) {
+                discussionArea.innerHTML = `
+                    <div class="empty-discussion">
+                        <div class="empty-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="empty-title">Aucune discussion</div>
+                        <div class="empty-text">
+                            Choisissez une conversation pour voir les messages
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Grouper les messages par date
+            const messagesByDate = {};
+            currentDiscussion.messages.forEach(message => {
+                if (!messagesByDate[message.date]) {
+                    messagesByDate[message.date] = [];
+                }
+                messagesByDate[message.date].push(message);
+            });
+            
+            // Générer le HTML de la discussion
+            let discussionHTML = `
+                <div class="discussion-header">
+                    <div class="discussion-avatar">${currentDiscussion.avatar}</div>
+                    <div class="discussion-info">
+                        <div class="discussion-name">${currentDiscussion.name}</div>
+                        <div class="discussion-status">
+                            <div class="status-dot ${currentDiscussion.online ? '' : 'offline'}"></div>
+                            <span>${currentDiscussion.online ? 'En ligne' : 'Hors ligne'}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="messages-container" id="messagesContainer">
+            `;
+            
+            // Ajouter les messages groupés par date
+            Object.keys(messagesByDate).forEach(date => {
+                discussionHTML += `
+                    <div class="date-separator">
+                        <span>${date}</span>
+                    </div>
+                `;
+                
+                messagesByDate[date].forEach(message => {
+                    discussionHTML += `
+                        <div class="message ${message.sent ? 'sent' : 'received'} ${message.photo ? 'message-with-photo' : ''}">
+                            ${message.photo ? `
+                                <img class="message-photo" src="${message.photo}" alt="Photo du message" onclick="openPhotoModal('${message.photo}')">
+                            ` : ''}
+                            ${message.text ? `
+                                <div class="message-bubble">${message.text}</div>
+                            ` : ''}
+                            <div class="message-info">
+                                <span class="message-time">${message.time}</span>
+                                ${message.sent ? `
+                                    <div class="message-status">
+                                        <i class="fas fa-check status-check read"></i>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+            
+            discussionHTML += `
+                </div>
+                
+                <div class="input-area">
+                    <div class="input-wrapper">
+                        <input type="text" class="message-input" id="messageInput" placeholder="Écrivez votre message..." onkeypress="handleKeyPress(event)">
+                        <div class="input-actions">
+                            <button class="input-btn" onclick="attachFile()">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                            <button class="input-btn send-btn" onclick="sendMessage()">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            discussionArea.innerHTML = discussionHTML;
+            
+            // Scroll vers le bas
+            setTimeout(() => {
+                const messagesContainer = document.getElementById('messagesContainer');
+                if (messagesContainer) {
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+            }, 100);
+            
+            console.log('✅ Discussion affichée avec succès');
+        }
+
+        function sendMessage() {
+            console.log('📤 Envoi de message');
+            
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            
+            if (!text || !currentDiscussion) {
+                console.log('❌ Texte vide ou pas de discussion');
+                return;
+            }
+            
+            // Créer le nouveau message
+            const newMessage = {
+                id: currentDiscussion.messages.length + 1,
+                text: text,
+                sent: true,
+                time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+                date: "Aujourd'hui"
+            };
+            
+            console.log('✨ Nouveau message:', newMessage);
+            
+            // Ajouter à la discussion
+            currentDiscussion.messages.push(newMessage);
+            currentDiscussion.lastMessage = text;
+            currentDiscussion.time = "À l'instant";
+            
+            // Vider et rafraîchir
+            input.value = '';
+            renderConversations();
+            renderDiscussion();
+            
+            console.log('🔄 Mise à jour terminée');
+            
+            // Simuler une réponse
+            setTimeout(() => {
+                simulateResponse();
+            }, 2000);
+        }
+
+        function simulateResponse() {
+            const responses = [
+                "Merci pour votre message !",
+                "Je suis très intéressé(e) par cet article",
+                "Pouvez-vous me donner plus de détails sur l'article ?",
+                "Est-ce que le prix est négociable ?",
+                "Quand serait-il disponible pour un essai ?",
+                "Acceptez-vous les échanges ?",
+                "Quel est l'état exact de l'article ?",
+                "Faites-vous des réductions pour plusieurs achats ?",
+                "Comment fonctionne la livraison ?",
+                "Pouvez-vous faire plus de photos ?"
+            ];
+            
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            
+            const responseMessage = {
+                id: currentDiscussion.messages.length + 1,
+                text: randomResponse,
+                sent: false,
+                time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+                date: "Aujourd'hui"
+            };
+            
+            console.log('🤖 Réponse simulée:', responseMessage);
+            
+            currentDiscussion.messages.push(responseMessage);
+            currentDiscussion.lastMessage = randomResponse;
+            currentDiscussion.time = "À l'instant";
+            
+            renderDiscussion();
+            renderConversations();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function attachFile() {
+            console.log('📎 Pièce jointe');
+            document.getElementById('photoInput').click();
+        }
+
+        function handlePhotoSelect(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                    sendPhotoMessage(file);
+                } else {
+                    alert('Veuillez sélectionner une image valide');
+                }
+            }
+        }
+
+        function sendPhotoMessage(file) {
+            console.log('📸 Envoi de photo:', file.name);
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const photoUrl = e.target.result;
+                
+                // Créer le message avec photo
+                const newMessage = {
+                    id: currentDiscussion.messages.length + 1,
+                    text: '',
+                    photo: photoUrl,
+                    sent: true,
+                    time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+                    date: "Aujourd'hui"
+                };
+                
+                console.log('✨ Message photo créé:', newMessage);
+                
+                // Ajouter à la discussion
+                currentDiscussion.messages.push(newMessage);
+                currentDiscussion.lastMessage = '📷 Photo';
+                currentDiscussion.time = "À l'instant";
+                
+                // Rafraîchir
+                renderConversations();
+                renderDiscussion();
+                
+                // Simuler une réponse
+                setTimeout(() => {
+                    simulatePhotoResponse();
+                }, 2000);
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        function simulatePhotoResponse() {
+            const responses = [
+                "Superbe photo ! L'article semble en excellent état.",
+                "Merci pour la photo, ça me donne une meilleure idée de l'article.",
+                "Belle qualité de photo ! L'article m'intéresse beaucoup.",
+                "Photo très claire, je vois bien les détails. C'est parfait !",
+                "Génial ! La photo montre bien la couleur et la texture."
+            ];
+            
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            
+            const responseMessage = {
+                id: currentDiscussion.messages.length + 1,
+                text: randomResponse,
+                sent: false,
+                time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+                date: "Aujourd'hui"
+            };
+            
+            console.log('🤖 Réponse photo simulée:', responseMessage);
+            
+            currentDiscussion.messages.push(responseMessage);
+            currentDiscussion.lastMessage = randomResponse;
+            currentDiscussion.time = "À l'instant";
+            
+            renderDiscussion();
+            renderConversations();
+        }
+
+        function openPhotoModal(photoUrl) {
+            const modal = document.getElementById('photoModal');
+            const modalContent = document.getElementById('photoModalContent');
+            
+            modalContent.src = photoUrl;
+            modal.style.display = 'flex';
+        }
+
+        function closePhotoModal() {
+            const modal = document.getElementById('photoModal');
+            modal.style.display = 'none';
+        }
+
+        // Drag & drop
+        function setupDragAndDrop() {
+            const dropZone = document.getElementById('dropZone');
+            const discussionArea = document.getElementById('discussionArea');
+            
+            if (!dropZone || !discussionArea) return;
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                discussionArea.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                discussionArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                discussionArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            discussionArea.addEventListener('drop', handleDrop, false);
+        }
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function highlight(e) {
+            document.getElementById('dropZone').classList.add('active');
+        }
+
+        function unhighlight(e) {
+            document.getElementById('dropZone').classList.remove('active');
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                    sendPhotoMessage(file);
+                } else {
+                    alert('Veuillez déposer une image valide');
+                }
+            }
+        }
+
+        // Mobile: toggle sidebar
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('show');
+        }
+
+        // Responsive
+        if (window.innerWidth <= 768) {
+            const header = document.querySelector('.header-title');
+            if (header) {
+                header.innerHTML = `
+                    <button class="back-btn" onclick="toggleSidebar()" style="margin-right: 12px;">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <i class="fas fa-comments"></i>
+                    Messages
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
